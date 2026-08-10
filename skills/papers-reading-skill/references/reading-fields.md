@@ -21,12 +21,10 @@ Use this schema when summarizing papers for a workbook explicitly specified by t
    - Keep book-title brackets if the user's style uses them, for example `《中国工业经济》`.
 
 5. `期刊等级`
-   - Prioritize Zhejiang University of Finance and Economics journal ranking from `zufe-journal-ranking-2020.md`.
-   - Treat the bundled 2020 directory as historical. For a current classification, verify the latest official policy version and do not silently apply the 2020 level.
-   - Put the school ranking first when found, then append confirmed external labels such as `北核`、`南核`、`AMI顶级`.
-   - Use the compact format `一级B；北核，南核，AMI顶级`.
-   - If only the school ranking is confirmed, write only the school ranking, for example `一级B`.
-   - If only external labels are confirmed, write only those labels, for example `北核，南核`.
+   - Record only classifications confirmed by a reliable source or supplied source material.
+   - Preserve each source system's exact label and relevant version; do not infer or translate classifications between systems.
+   - Use the compact format `北核，南核，AMI顶级`.
+   - If only one classification is confirmed, record only that label.
    - If a ranking or label is not confirmed, omit it. Do not write `待核实`, `未知`, `未检索到`, or similar missing-status text in this field.
 
 6. `发表时间`
@@ -84,7 +82,7 @@ The example row in the workbook uses dense but readable Chinese academic prose. 
 - `实证模型`: layered lines for baseline model, endogeneity, robustness, and extended tests.
 - `数据来源和变量设置`: layered lines for sample, data, core variables, mechanism variables, and controls.
 - `可进一步延伸的研究设计`: two to four numbered and executable extensions linked directly to the paper's evidence or limitations.
-- `期刊等级`: compact ranking string such as `一级B；北核，南核，AMI顶级`; include only confirmed rankings and labels.
+- `期刊等级`: compact ranking string such as `北核，南核，AMI顶级`; include only confirmed rankings and labels.
 
 ## Existing Workbook Append Rules
 
@@ -99,7 +97,7 @@ When writing into an existing workbook such as `01论文研读汇总.xlsx`:
 7. Preserve the workbook's sequence formula pattern. If column A uses `=ROW()-1`, use the corresponding formula in the new row rather than replacing earlier sequence values.
 8. Expand the existing Excel table and filter range to include only the appended rows; do not rename the table or add tracking columns outside the 13-field schema.
 9. Save to a temporary file, reopen it for structural and value validation, create a timestamped backup of the original, and then replace the target atomically. If validation fails or the workbook is locked, leave the original untouched.
-10. When the workbook's populated example rows use a different punctuation or date-granularity convention from the generic examples in this schema, follow the workbook's established convention. For example, preserve `一级B、北核、南核` and year-only publication cells when those are the prevailing styles, while retaining the precise publication date in the automation database.
+10. When the workbook's populated example rows use a different punctuation or date-granularity convention from the generic examples in this schema, follow the workbook's established convention. For example, preserve `北核、南核、AMI顶级` and year-only publication cells when those are the prevailing styles, while retaining the precise publication date in the automation database.
 11. Use `scripts/append_paper_reading.py` for deterministic insertion. Pass `--workbook <path>` or set `PAPER_READING_WORKBOOK`; the script never assumes a personal filesystem path. It upgrades the 12-column schema safely, checks duplicates, preserves formatting, creates a backup, validates the temporary workbook, and replaces the source atomically.
 
 ## Minimum Completeness Check

@@ -9,7 +9,6 @@
 - 按固定顺序提取题名、作者、期刊、等级、时间、关键词、研究问题、结论、研究逻辑、实证模型、数据与变量以及延伸设计。
 - 对基准结果、作用机制、异质性、经济后果、内生性与稳健性检验进行分层表达。
 - 避免把相关关系误写为因果关系，不补造缺失的变量、模型、数据来源或期刊等级。
-- 使用确定性查询脚本在历史浙财大目录中进行精确期刊名查找，并明确返回版本警告。
 - 在兼容的 12 列工作簿中安全补充第 13 列，并保留原有内容、样式、公式、筛选与表格结构。
 - 写入前查重；写入时先保存临时文件并验证，再备份和原子替换原工作簿。
 
@@ -95,17 +94,9 @@ python skills/papers-reading-skill/scripts/append_paper_reading.py \
 
 脚本输出 JSON 状态，例如 `paper_appended`、`duplicate_skipped`、`schema_updated` 或 `error`。发生校验错误时，原工作簿保持不变。
 
-查询历史 2020 版目录中的精确列举等级：
-
-```bash
-python skills/papers-reading-skill/scripts/lookup_zufe_ranking.py \
-  --journal "中国工业经济" \
-  --pretty
-```
-
 ## 字段与期刊等级边界
 
-字段定义见 [`reading-fields.md`](skills/papers-reading-skill/references/reading-fields.md)。仓库内的浙财大期刊目录是 **2020 年修订版的历史提取文本**，并非自动代表当前等级。浙江财经大学科研处的[官方期刊定级索引](https://kyc.zufe.edu.cn/qkcx/zcqkdjbz.htm)还列有后续修订版本；涉及当前评价、职称、成果申报或投稿决策时，必须核实适用版本与生效日期。
+字段定义见 [`reading-fields.md`](skills/papers-reading-skill/references/reading-fields.md)。期刊等级仅记录经可靠来源确认的原始标签；不同评价体系之间不得推断或换算。涉及当前评价、职称、成果申报或投稿决策时，必须核实适用体系、版本与生效日期。
 
 ## 开发与验证
 
@@ -117,10 +108,10 @@ python -m unittest discover -s tests -v
 
 GitHub Actions 会在推送和拉取请求上验证 skill 元数据，并对 Excel 写入、重复检测、环境变量配置和失败不改源文件等行为执行端到端测试。
 
-## 许可与第三方资料
+## 许可
 
-本仓库目前未附加开源许可证。公开可见不等于自动授予复制、修改或分发权利。`zufe-journal-ranking-policy-fulltext.txt` 是浙江财经大学政策文件的文本提取件，权利归原发布机构或相关权利人所有；使用时应以官方文件为准。
+本仓库目前未附加开源许可证。公开可见不等于自动授予复制、修改或分发权利。
 
 ## English summary
 
-This repository contains an installable Codex skill for evidence-grounded academic paper reading and safe Excel-based literature-review management. Install `skills/papers-reading-skill/`, configure a workbook explicitly, and use `$papers-reading-skill`. The bundled ZUFE ranking corpus is historical and must not be treated as a current classification without verification.
+This repository contains an installable Codex skill for evidence-grounded academic paper reading and safe Excel-based literature-review management. Install `skills/papers-reading-skill/`, configure a workbook explicitly, and use `$papers-reading-skill`.

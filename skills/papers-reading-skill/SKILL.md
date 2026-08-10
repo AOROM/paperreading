@@ -17,9 +17,6 @@ description: Read finance, economics, management, and social-science papers into
 ## Required references
 
 - Read `references/reading-fields.md` before producing structured fields or writing a workbook row.
-- Read `references/zufe-journal-ranking-2020.md` before assigning `期刊等级`.
-- Treat `references/zufe-journal-ranking-policy-fulltext.txt` as a historical 2020-policy lookup corpus. Run `scripts/lookup_zufe_ranking.py --journal "<期刊名称>"` for an exact listed-journal lookup. If needed, inspect a targeted literal-text match and its nearby `TOP期刊`、`一级A期刊` or `一级B期刊` heading; do not load all 4,000+ lines.
-- For a current classification, verify the latest official policy version instead of assuming that the bundled 2020 directory is still current. Record only a confirmed classification.
 
 ## Evidence rules
 
@@ -30,7 +27,7 @@ description: Read finance, economics, management, and social-science papers into
 - Do not describe correlation as causality unless the identification design supports causal language.
 - Report variable abbreviations with their meanings and preserve explicitly reported null results.
 - Propose two to four paper-specific extensions. Give each an implementable identification strategy, sample or data source, variable construction, mechanism test, outcome, or falsification test.
-- For `期刊等级`, place a confirmed Zhejiang University of Finance and Economics level first, then append independently confirmed labels such as `北核`、`南核` or an AMI level. Omit unconfirmed labels and missing-status placeholders.
+- For `期刊等级`, record only independently confirmed labels such as `北核`、`南核` or an AMI level. Preserve the source system's exact label, omit unconfirmed labels and missing-status placeholders, and do not translate one ranking system into another.
 
 ## Output contract
 
