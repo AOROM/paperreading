@@ -1,15 +1,23 @@
 # Contributing
 
-感谢改进 Paper Reading Skill。提交变更前，请遵守以下约定。
+**English** | [简体中文](CONTRIBUTING.zh-CN.md)
 
-## 变更范围
+Thank you for improving Paper Reading Skill. Follow these conventions before submitting a change.
 
-- 将 Codex 运行所需的指令、脚本和参考资料放在 `skills/papers-reading-skill/`。
-- 将面向维护者的说明、测试、示例和 CI 配置保留在仓库层，避免增加 skill 的上下文负担。
-- 不提交论文全文、未获授权的数据、个人工作簿、访问令牌、个人路径或其他敏感信息。
-- 修改期刊等级资料时，注明来源、版本、生效边界和核验日期；不要把历史目录描述为当前目录。
+## Scope of changes
 
-## 本地检查
+- Keep the instructions, scripts, and references required by Codex at runtime in `skills/papers-reading-skill/`.
+- Keep maintainer documentation, tests, examples, and CI configuration at the repository level so they do not increase the skill's runtime context.
+- Do not commit full paper texts, data without redistribution permission, personal workbooks, access tokens, personal filesystem paths, or other sensitive information.
+- When modifying journal-ranking data, document its source, version, effective boundary, and verification date. Do not present a historical directory as current.
+
+## Documentation translations
+
+- Keep `README.md` and `README.zh-CN.md` semantically aligned.
+- Keep `CONTRIBUTING.md` and `CONTRIBUTING.zh-CN.md` semantically aligned.
+- Keep commands, paths, identifiers, and behavioral contracts identical across languages; translate explanatory prose only.
+
+## Local checks
 
 ```bash
 python -m pip install -r requirements-dev.txt
@@ -17,13 +25,13 @@ python tools/validate_skill.py skills/papers-reading-skill
 python -m unittest discover -s tests -v
 ```
 
-新增或修改写入逻辑时，至少覆盖正常追加、重复跳过、表头不匹配不改源文件，以及显式路径或环境变量解析。
+When adding or changing workbook-write logic, cover at least a successful append, a duplicate no-op, a header mismatch that leaves the source unchanged, and target resolution through either an explicit path or the environment variable.
 
-## Pull request
+## Pull requests
 
-在说明中写清：
+State clearly:
 
-1. 要解决的问题；
-2. 行为或字段契约是否变化；
-3. 执行过的验证命令及结果；
-4. 涉及外部资料时的来源与版本。
+1. The problem being solved;
+2. Whether any behavior or field contract changes;
+3. The validation commands you ran and their results;
+4. The source and version of any external material involved.
