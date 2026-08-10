@@ -4,9 +4,17 @@ Use this reference when filling the `期刊等级` field in the paper reading ta
 
 ## Source
 
-Primary source: `关于印发《浙江财经大学中外文学术期刊定级管理办法（2020年修订）》的通知.doc`.
+Primary document: `关于印发《浙江财经大学中外文学术期刊定级管理办法（2020年修订）》的通知`（浙财大〔2021〕16号，2021-01-22）.
+
+Official policy index: <https://kyc.zufe.edu.cn/qkcx/zcqkdjbz.htm>
 
 Extracted full text for lookup: `zufe-journal-ranking-policy-fulltext.txt`.
+
+Extracted-file SHA-256: `0EE28CDC49C5A64B5BAAE80B84E18007B0EEE0F9D988192BFAF1C69BCE2A6DF4`.
+
+## Version boundary
+
+The bundled corpus represents the 2020 revision and is suitable only when that policy version is the intended basis. The official index also lists a 2024 revision. For current evaluation, promotion, reporting, or journal-selection decisions, verify the policy version and effective date on the official index before assigning a level. Never present a historical 2020 lookup as a current classification without confirmation.
 
 ## Output Rule
 
@@ -71,10 +79,11 @@ Do not infer `北核`, `南核`, or AMI labels only from the Zhejiang University
 ## Lookup Procedure
 
 1. Normalize the journal name by removing book-title brackets such as `《》`, spaces, and punctuation variants.
-2. Search `zufe-journal-ranking-policy-fulltext.txt` for the exact journal name.
-3. If the journal appears under Chinese `TOP期刊`、`一级A期刊`、`一级B期刊`, use that level.
-4. If the exact journal is not listed, apply the rule-based CSSCI/CSCD/北核 categories only when those external inclusions are confirmed.
-5. Construct the field with the school level first and external labels after a semicolon.
+2. Run `python scripts/lookup_zufe_ranking.py --journal "中国工业经济"` from the skill directory. The script performs an exact normalized lookup and returns the listed historical level as JSON.
+3. If the script returns no match, search `zufe-journal-ranking-policy-fulltext.txt` literally and inspect the nearby heading; do not infer a listed level from a partial-name match.
+4. If the journal appears under Chinese `TOP期刊`、`一级A期刊`、`一级B期刊`, use that level.
+5. If the exact journal is not listed, apply the rule-based CSSCI/CSCD/北核 categories only when those external inclusions are confirmed.
+6. Construct the field with the school level first and external labels after a semicolon.
 
 ## Example
 

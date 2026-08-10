@@ -1,0 +1,11 @@
+* text=auto eol=lf
+*.md text eol=lf
+*.py text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.txt text eol=lf
+*.xlsx binary
+
+# Preserve the byte-exact extracted policy corpus and its documented SHA-256.
+skills/papers-reading-skill/references/zufe-journal-ranking-policy-fulltext.txt -text

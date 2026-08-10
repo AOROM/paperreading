@@ -1,0 +1,4 @@
+interface:
+  display_name: "Papers Reading"
+  short_description: "Structure papers into 13 fields and write Excel safely."
+  default_prompt: "Use $papers-reading-skill to read this paper into 13 evidence-grounded fields and append the validated row to my configured workbook."

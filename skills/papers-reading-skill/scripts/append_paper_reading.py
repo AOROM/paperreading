@@ -18,9 +18,10 @@ from openpyxl import load_workbook
 from openpyxl.formula.translate import Translator
 from openpyxl.utils import get_column_letter, range_boundaries
 from openpyxl.worksheet.datavalidation import DataValidation
+from openpyxl.worksheet.table import TableColumn
 
 
-DEFAULT_WORKBOOK = Path(r"E:\0论文\01论文研读及指标设计\01论文研读汇总.xlsx")
+WORKBOOK_ENV_VAR = "PAPER_READING_WORKBOOK"
 
 FIELDS = [
     "序号",
@@ -37,6 +38,11 @@ FIELDS = [
     "数据来源和变量设置",
     "可进一步延伸的研究设计",
 ]
+
+
+def workbook_from_environment() -> Path | None:
+    value = os.environ.get(WORKBOOK_ENV_VAR, "").strip()
+    return Path(value).expanduser() if value else None
 
 
 def copy_cell_format(source, target) -> None:
@@ -76,6 +82,37 @@ def sheet_snapshot(ws, excluded_rows: set[int] | None = None) -> dict:
     }
 
 
+def extend_table_to_thirteenth_field(table, max_row: int) -> bool:
+    min_col, min_row, max_col, current_max_row = range_boundaries(table.ref)
+    if min_row != 1 or min_col != 1 or max_col not in (12, 13):
+        return False
+
+    original_ref = table.ref
+    original_filter_ref = table.autoFilter.ref if table.autoFilter is not None else None
+
+    if max_col == 12:
+        if len(table.tableColumns) != 12:
+            raise ValueError(
+                f"表格“{table.name}”的范围为12列，但列定义数量为"
+                f"{len(table.tableColumns)}；已停止写入。"
+            )
+        next_id = max(column.id for column in table.tableColumns) + 1
+        table.tableColumns.append(TableColumn(id=next_id, name=FIELDS[12]))
+    elif len(table.tableColumns) != 13:
+        raise ValueError(
+            f"表格“{table.name}”的范围为13列，但列定义数量为"
+            f"{len(table.tableColumns)}；已停止写入。"
+        )
+
+    new_ref = f"A1:M{max(current_max_row, max_row)}"
+    table.ref = new_ref
+    if table.autoFilter is not None:
+        table.autoFilter.ref = new_ref
+    return table.ref != original_ref or (
+        table.autoFilter is not None and table.autoFilter.ref != original_filter_ref
+    )
+
+
 def ensure_thirteenth_field(ws) -> bool:
     actual = [ws.cell(1, col).value for col in range(1, 13)]
     if actual != FIELDS[:12]:
@@ -105,8 +142,7 @@ def ensure_thirteenth_field(ws) -> bool:
             copy_cell_format(ws.cell(row, 12), ws.cell(row, 13))
 
     has_m_validation = any(
-        "M2:M1000" in str(item.sqref)
-        for item in ws.data_validations.dataValidation
+        "M2:M1000" in str(item.sqref) for item in ws.data_validations.dataValidation
     )
     if not has_m_validation:
         validation = DataValidation(type="custom", formula1="TRUE", allow_blank=True)
@@ -120,14 +156,15 @@ def ensure_thirteenth_field(ws) -> bool:
     filter_ref = ws.auto_filter.ref
     if filter_ref:
         min_col, min_row, _max_col, max_row = range_boundaries(filter_ref)
-        ws.auto_filter.ref = (
+        new_filter_ref = (
             f"{get_column_letter(min_col)}{min_row}:M{max(max_row, ws.max_row)}"
         )
+        if new_filter_ref != filter_ref:
+            ws.auto_filter.ref = new_filter_ref
+            changed = True
 
     for table in ws.tables.values():
-        min_col, min_row, max_col, max_row = range_boundaries(table.ref)
-        if min_row == 1 and min_col == 1 and max_col in (12, 13):
-            table.ref = f"A1:M{max(max_row, ws.max_row)}"
+        changed = extend_table_to_thirteenth_field(table, ws.max_row) or changed
 
     return changed
 
@@ -152,10 +189,14 @@ def find_duplicate_row(ws, payload: dict) -> int | None:
     return None
 
 
-def translated_formula(source_value: object, source_coordinate: str, target_coordinate: str) -> str:
+def translated_formula(
+    source_value: object, source_coordinate: str, target_coordinate: str
+) -> str:
     if isinstance(source_value, str) and source_value.startswith("="):
         try:
-            return Translator(source_value, origin=source_coordinate).translate_formula(target_coordinate)
+            return Translator(source_value, origin=source_coordinate).translate_formula(
+                target_coordinate
+            )
         except Exception:
             return source_value
     return "=ROW()-1"
@@ -164,7 +205,9 @@ def translated_formula(source_value: object, source_coordinate: str, target_coor
 def append_payload(ws, payload: dict) -> int:
     duplicate = find_duplicate_row(ws, payload)
     if duplicate is not None:
-        raise FileExistsError(f"检测到重复论文，现有行号为 {duplicate}；未追加、未覆盖。")
+        raise FileExistsError(
+            f"检测到重复论文，现有行号为 {duplicate}；未追加、未覆盖。"
+        )
 
     last_row = find_last_title_row(ws)
     append_row = max(2, last_row + 1)
@@ -191,9 +234,7 @@ def append_payload(ws, payload: dict) -> int:
             f"{get_column_letter(min_col)}{min_row}:M{max(max_row, append_row)}"
         )
     for table in ws.tables.values():
-        min_col, min_row, max_col, max_row = range_boundaries(table.ref)
-        if min_row == 1 and min_col == 1 and max_col in (12, 13):
-            table.ref = f"A1:M{max(max_row, append_row)}"
+        extend_table_to_thirteenth_field(table, append_row)
 
     return append_row
 
@@ -206,13 +247,21 @@ def validate_payload(payload: dict) -> None:
         raise ValueError("“论文名称”不能为空。")
 
 
-def save_validate_replace(path: Path, wb, before: dict, target_sheet: str | None, row: int | None) -> Path:
+def save_validate_replace(
+    path: Path,
+    wb,
+    before: dict,
+    target_sheet: str | None,
+    row: int | None,
+) -> Path:
     temp_path = path.with_name(f".{path.stem}.{uuid.uuid4().hex}.tmp{path.suffix}")
     backup_path = path.with_name(
         f"{path.stem}.backup_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}{path.suffix}"
     )
+    check = None
     try:
         wb.save(temp_path)
+        wb.close()
         check = load_workbook(temp_path, read_only=False, data_only=False)
         if check.sheetnames != list(before):
             raise ValueError("保存后工作表名称或顺序发生变化。")
@@ -234,16 +283,22 @@ def save_validate_replace(path: Path, wb, before: dict, target_sheet: str | None
 
         if target_sheet and row is not None:
             ws = check[target_sheet]
-            if ws.cell(row, 2).value in (None, "") or ws.cell(row, 13).value in (None, ""):
+            if ws.cell(row, 2).value in (None, "") or ws.cell(row, 13).value in (
+                None,
+                "",
+            ):
                 raise ValueError("新增行的论文名称或延伸研究设计为空。")
             if not str(ws.cell(row, 1).value).startswith("="):
                 raise ValueError("新增行序号公式未保留。")
 
         check.close()
+        check = None
         shutil.copy2(path, backup_path)
         os.replace(temp_path, path)
         return backup_path
     except Exception:
+        if check is not None:
+            check.close()
         if temp_path.exists():
             temp_path.unlink()
         raise
@@ -251,7 +306,14 @@ def save_validate_replace(path: Path, wb, before: dict, target_sheet: str | None
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--workbook", type=Path, default=DEFAULT_WORKBOOK)
+    parser.add_argument(
+        "--workbook",
+        type=Path,
+        help=(
+            "Target .xlsx workbook. If omitted, use the "
+            f"{WORKBOOK_ENV_VAR} environment variable."
+        ),
+    )
     parser.add_argument("--sheet", choices=["中文", "英文"], default="中文")
     parser.add_argument("--data-json", type=Path)
     parser.add_argument(
@@ -264,7 +326,13 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    path = args.workbook.resolve()
+    workbook = args.workbook or workbook_from_environment()
+    if workbook is None:
+        raise ValueError(
+            "未指定工作簿。请传入 --workbook <path> 或设置环境变量 "
+            f"{WORKBOOK_ENV_VAR}。"
+        )
+    path = workbook.expanduser().resolve()
     if not path.exists():
         raise FileNotFoundError(f"工作簿不存在：{path}")
     if not args.schema_only and args.data_json is None:
@@ -272,6 +340,7 @@ def main() -> int:
 
     wb = load_workbook(path, read_only=False, data_only=False, keep_links=True)
     if "中文" not in wb.sheetnames or "英文" not in wb.sheetnames:
+        wb.close()
         raise ValueError("工作簿必须包含“中文”和“英文”工作表。")
 
     before = {name: sheet_snapshot(wb[name]) for name in wb.sheetnames}
@@ -286,6 +355,7 @@ def main() -> int:
         validate_payload(payload)
         duplicate = find_duplicate_row(wb[args.sheet], payload)
         if duplicate is not None:
+            wb.close()
             print(
                 json.dumps(
                     {
@@ -302,6 +372,7 @@ def main() -> int:
         appended_row = append_payload(wb[args.sheet], payload)
 
     if not schema_changed and appended_row is None:
+        wb.close()
         print(
             json.dumps(
                 {"action": "schema_already_current", "workbook": str(path)},
@@ -313,7 +384,9 @@ def main() -> int:
     excluded_before = {name: before[name] for name in before}
     if appended_row is not None and appended_row <= wb[args.sheet].max_row:
         original = load_workbook(path, read_only=False, data_only=False)
-        excluded_before[args.sheet] = sheet_snapshot(original[args.sheet], {appended_row})
+        excluded_before[args.sheet] = sheet_snapshot(
+            original[args.sheet], {appended_row}
+        )
         original.close()
 
     backup = save_validate_replace(
@@ -327,7 +400,9 @@ def main() -> int:
     print(
         json.dumps(
             {
-                "action": "schema_updated" if appended_row is None else "paper_appended",
+                "action": "schema_updated"
+                if appended_row is None
+                else "paper_appended",
                 "workbook": str(path),
                 "backup": str(backup),
                 "sheet": args.sheet if appended_row is not None else None,
@@ -343,5 +418,8 @@ if __name__ == "__main__":
     try:
         raise SystemExit(main())
     except Exception as exc:
-        print(json.dumps({"action": "error", "message": str(exc)}, ensure_ascii=False), file=sys.stderr)
+        print(
+            json.dumps({"action": "error", "message": str(exc)}, ensure_ascii=False),
+            file=sys.stderr,
+        )
         raise SystemExit(1)

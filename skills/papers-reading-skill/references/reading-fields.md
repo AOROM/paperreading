@@ -1,6 +1,6 @@
 # Paper Reading Field Schema
 
-Use this schema when summarizing papers into the user's default workbook at `E:\0论文\01论文研读及指标设计\01论文研读汇总.xlsx` or another workbook explicitly specified by the user.
+Use this schema when summarizing papers for a workbook explicitly specified by the user or configured through `PAPER_READING_WORKBOOK`.
 
 ## Fields
 
@@ -22,6 +22,7 @@ Use this schema when summarizing papers into the user's default workbook at `E:\
 
 5. `期刊等级`
    - Prioritize Zhejiang University of Finance and Economics journal ranking from `zufe-journal-ranking-2020.md`.
+   - Treat the bundled 2020 directory as historical. For a current classification, verify the latest official policy version and do not silently apply the 2020 level.
    - Put the school ranking first when found, then append confirmed external labels such as `北核`、`南核`、`AMI顶级`.
    - Use the compact format `一级B；北核，南核，AMI顶级`.
    - If only the school ranking is confirmed, write only the school ranking, for example `一级B`.
@@ -99,7 +100,7 @@ When writing into an existing workbook such as `01论文研读汇总.xlsx`:
 8. Expand the existing Excel table and filter range to include only the appended rows; do not rename the table or add tracking columns outside the 13-field schema.
 9. Save to a temporary file, reopen it for structural and value validation, create a timestamped backup of the original, and then replace the target atomically. If validation fails or the workbook is locked, leave the original untouched.
 10. When the workbook's populated example rows use a different punctuation or date-granularity convention from the generic examples in this schema, follow the workbook's established convention. For example, preserve `一级B、北核、南核` and year-only publication cells when those are the prevailing styles, while retaining the precise publication date in the automation database.
-11. Use `scripts/append_paper_reading.py` for deterministic insertion. The script defaults to the user's workbook path, upgrades the 12-column schema safely, checks duplicates, preserves formatting, creates a backup, validates the temporary workbook, and replaces the source atomically.
+11. Use `scripts/append_paper_reading.py` for deterministic insertion. Pass `--workbook <path>` or set `PAPER_READING_WORKBOOK`; the script never assumes a personal filesystem path. It upgrades the 12-column schema safely, checks duplicates, preserves formatting, creates a backup, validates the temporary workbook, and replaces the source atomically.
 
 ## Minimum Completeness Check
 

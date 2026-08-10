@@ -1,0 +1,29 @@
+name: Bug report
+description: Report a reproducible skill or workbook-writing problem.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not upload confidential papers, real workbooks, credentials, or personal paths.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Provide sanitized steps, inputs, and error output.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Operating system, Python version, openpyxl version, and Codex client.
+    validations:
+      required: true
