@@ -1,0 +1,4 @@
+interface:
+  display_name: "Papers Reading Skill"
+  short_description: "Read papers into 13 fields and append them safely to Excel."
+  default_prompt: "Use $papers-reading-skill to read this paper, produce the 13 structured review fields, and append the validated row to the default review workbook."
