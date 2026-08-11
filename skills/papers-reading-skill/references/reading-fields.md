@@ -1,6 +1,6 @@
 # Paper Reading Field Schema
 
-Use this schema when summarizing papers for a workbook explicitly specified by the user or configured through `PAPER_READING_WORKBOOK`.
+Use this legacy projection schema only when reviewing or exporting a `PaperRecord` to a workbook explicitly specified by the user or configured through `PAPER_READING_WORKBOOK`.
 
 ## Fields
 
@@ -98,7 +98,7 @@ When writing into an existing workbook such as `01论文研读汇总.xlsx`:
 8. Expand the existing Excel table and filter range to include only the appended rows; do not rename the table or add tracking columns outside the 13-field schema.
 9. Save to a temporary file, reopen it for structural and value validation, create a timestamped backup of the original, and then replace the target atomically. If validation fails or the workbook is locked, leave the original untouched.
 10. When the workbook's populated example rows use a different punctuation or date-granularity convention from the generic examples in this schema, follow the workbook's established convention. For example, preserve `北核、南核、AMI顶级` and year-only publication cells when those are the prevailing styles, while retaining the precise publication date in the automation database.
-11. Use `scripts/append_paper_reading.py` for deterministic insertion. Pass `--workbook <path>` or set `PAPER_READING_WORKBOOK`; the script never assumes a personal filesystem path. It upgrades the 12-column schema safely, checks duplicates, preserves formatting, creates a backup, validates the temporary workbook, and replaces the source atomically.
+11. Use `paperreading export <record.json> <workbook.xlsx> --format excel --sheet <中文|英文>` for deterministic insertion. The compatibility wrapper at `scripts/append_paper_reading.py` remains available for legacy 13-field JSON payloads. Both paths upgrade the 12-column schema safely, check duplicates, preserve formatting, create a backup, validate the temporary workbook, and replace the source atomically.
 
 ## Minimum Completeness Check
 

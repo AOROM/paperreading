@@ -14,8 +14,14 @@ from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.worksheet.table import Table
 
-
 ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from paperreading.domain import PaperRecord  # noqa: E402
+from paperreading.exporters.excel import ExcelExporter  # noqa: E402
+
 SCRIPT = (
     ROOT / "skills" / "papers-reading-skill" / "scripts" / "append_paper_reading.py"
 )
@@ -192,6 +198,26 @@ class AppendPaperReadingTests(unittest.TestCase):
             self.assertEqual(chinese["B3"].value, "测试论文")
             self.assertEqual(chinese["M3"].value, example_payload()[FIELDS[12]])
             self.assertEqual(chinese.column_dimensions["M"].width, 42)
+        finally:
+            workbook.close()
+
+    def test_core_excel_exporter_projects_rich_record(self) -> None:
+        create_workbook(self.workbook)
+        record = PaperRecord.model_validate_json(
+            (ROOT / "examples" / "paper-record.example.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        status = ExcelExporter().export([record], self.workbook, sheet="中文")
+        self.assertEqual(status["action"], "paper_appended")
+        self.assertTrue(Path(str(status["backup"])).exists())
+
+        workbook = load_workbook(self.workbook, data_only=False)
+        try:
+            chinese = workbook["中文"]
+            self.assertEqual(chinese["B3"].value, record.metadata.title)
+            self.assertIn("【基准结论】", chinese["I3"].value)
+            self.assertIn("【识别强化】", chinese["M3"].value)
         finally:
             workbook.close()
 

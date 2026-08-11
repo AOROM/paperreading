@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "paperreading"
+version = "0.2.0"
+description = "Evidence-grounded AI research intelligence core and workflow"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Information Analysis",
+]
+dependencies = [
+  "pydantic>=2.13,<2.14",
+  "typer>=0.20,<0.21",
+]
+
+[project.optional-dependencies]
+excel = ["openpyxl>=3.1,<4"]
+dev = [
+  "mypy>=1.15,<2",
+  "PyYAML>=6,<7",
+  "ruff>=0.12,<1",
+]
+
+[project.scripts]
+paperreading = "paperreading.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/AOROM/paperreading"
+Repository = "https://github.com/AOROM/paperreading"
+Issues = "https://github.com/AOROM/paperreading/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+mypy_path = "src"
+packages = ["paperreading"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["paperreading.exporters.excel"]
+ignore_errors = true

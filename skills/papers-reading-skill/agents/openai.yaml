@@ -1,4 +1,4 @@
 interface:
-  display_name: "Evidence-Grounded Paper Reading"
-  short_description: "Turn papers into traceable evidence and safe Excel rows."
-  default_prompt: "Use $papers-reading-skill to turn this paper into 13 evidence-grounded fields, separate source claims from reported evidence and assessment, and append the validated row to my configured workbook."
+  display_name: "PaperReading Research Intelligence"
+  short_description: "Build traceable paper records and validated research exports."
+  default_prompt: "Use $papers-reading-skill to turn this supplied paper into a validated PaperRecord with claim-to-evidence links, then produce a Markdown draft without modifying my workbook."

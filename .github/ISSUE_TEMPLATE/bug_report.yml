@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a reproducible skill or workbook-writing problem.
+description: Report a reproducible Core, CLI, Skill, schema, or exporter problem.
 title: "[Bug]: "
 labels: [bug]
 body:
@@ -24,6 +24,6 @@ body:
     id: environment
     attributes:
       label: Environment
-      description: Operating system, Python version, openpyxl version, and Codex client.
+      description: Operating system, Python version, PaperReading version, installed extras, and Codex client if relevant.
     validations:
       required: true

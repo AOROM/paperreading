@@ -1,158 +1,223 @@
-# Paper Reading Skill
+# PaperReading
 
-**Evidence-grounded AI research workflow**
+**Evidence-Grounded AI Research Intelligence**
 
 **English** | [简体中文](README.zh-CN.md)
 
 [![CI](https://github.com/AOROM/paperreading/actions/workflows/ci.yml/badge.svg)](https://github.com/AOROM/paperreading/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB)
+![Version](https://img.shields.io/badge/version-0.2.0-4C1)
 
-Turn academic papers into structured, reviewable research records. Paper Reading Skill separates source claims, reported evidence, and researcher assessment; preserves uncertainty instead of inventing missing facts; proposes executable follow-up designs; and can safely append validated results to an existing Excel literature-review workbook.
+PaperReading turns a paper into a strict, reviewable research object in which source claims, reported evidence, and researcher assessment remain separate. The Core validates evidence provenance and causal language, then exports the same record to JSON, Markdown, or a backward-compatible Excel workflow.
+
+> Current scope: v0.2 is a Core architecture release. It accepts structured `PaperRecord` JSON created by the Codex Skill or another adapter. The Core does not yet parse arbitrary PDFs or call an AI provider by itself; those capabilities remain on the roadmap.
 
 ## Why this project
 
-AI can summarize a paper quickly, but a useful research workflow must also answer:
+Fast summarization is not enough for research. A usable workflow must also answer:
 
-- Which statements come from the paper, and which are interpretation?
-- What evidence supports each reported finding?
-- Does the identification strategy justify causal language?
-- What information is missing or still unconfirmed?
-- Can the result enter an existing research system without damaging it?
+- Which statement comes from the paper, and which is interpretation?
+- Which page, section, table, figure, or equation supports a finding?
+- Does the identification design justify causal language?
+- Can the result be reused without collapsing it into one prose summary?
+- Can it enter an existing workbook without damaging the source file?
 
-This project treats those questions as workflow constraints rather than optional writing style.
+PaperReading makes those questions machine-checkable workflow constraints.
 
-## Workflow
+## Implemented in v0.2
+
+| Capability | Status | Contract |
+|---|---|---|
+| Paper Intelligence Schema | Implemented | Strict Pydantic `PaperRecord`; unknown fields fail validation |
+| Evidence grounding | Implemented | Claims, findings, mechanisms, and tests bind to `EvidenceRef` objects |
+| Confidence model | Implemented | Confidence is recalculated from locator specificity, not accepted as model opinion |
+| Causal-language guard | Implemented | Unsupported causal wording produces a warning or validation error |
+| Legacy 13-field output | Implemented | Generated through a projection; it is no longer the Core model |
+| Exporters | Implemented | JSON, Markdown, and safe Excel append |
+| CLI and Python API | Implemented | One Core shared by the CLI and Codex Skill adapter |
+| PDF parsing, batch library, synthesis, gaps | Planned | Tracked explicitly in the [roadmap](ROADMAP.md) |
+
+## Architecture
 
 ```mermaid
-flowchart LR
-    A["Academic paper"] --> B["Source-aware reading"]
-    B --> C["Claims · Evidence · Assessment"]
-    C --> D["Validated 13-field record"]
-    D --> E{"User-selected output"}
-    E --> F["Reviewable draft"]
-    E --> G["Excel row"]
-    G --> H["Backup · Validate · Atomic replace"]
+flowchart TB
+    P["Academic paper"] --> A["Codex Skill or future ingestion adapter"]
+    A --> R["PaperRecord Core"]
+    R --> E["Evidence validation"]
+    R --> C["Causal-language guard"]
+    E --> O{"Validated output"}
+    C --> O
+    O --> J["Lossless JSON"]
+    O --> M["Reviewable Markdown"]
+    O --> L["Legacy 13-field projection"]
+    L --> X["Safe Excel exporter"]
 ```
 
-## Design principles
+The dependency direction is deliberate:
 
-- **Evidence before interpretation**: distinguish what the paper states, what its results show, and what the reviewer infers.
-- **Unknown stays unknown**: never invent a model, variable, test, source, ranking, or causal claim to fill a gap.
-- **Causal language follows identification**: describe association as association unless the research design supports a causal interpretation.
-- **Structured output remains reviewable**: organize every paper into the same 13-field contract while preserving null results and study limitations.
-- **Automation must be reversible**: validate before writing, detect duplicates, create a backup, and replace the workbook atomically.
-- **The user controls mutation**: produce a draft unless a workbook path is explicitly supplied or configured.
+```text
+domain <- validation / projections <- CLI / Skill / exporters
+```
 
-## What you get
-
-The workflow produces these fields in a fixed order:
-
-`序号` · `论文名称` · `作者` · `期刊` · `期刊等级` · `发表时间` · `关键词` · `研究问题` · `研究结论` · `研究逻辑` · `实证模型` · `数据来源和变量设置` · `可进一步延伸的研究设计`
-
-It can:
-
-- layer baseline findings, mechanisms, heterogeneity, economic consequences, endogeneity treatment, and robustness checks;
-- preserve source locations in review notes when page or section information is available;
-- propose two to four paper-specific research extensions with executable identification or data designs;
-- generate a draft without touching a workbook; or
-- safely add the thirteenth field to a compatible 12-column workbook and append a validated row.
+The domain layer does not import Typer, OpenPyXL, a model SDK, or Codex. Excel exists only in its exporter; the Skill is an interface to the same Core.
 
 ## Quick start
 
-1. Clone the repository and install the deterministic writer dependency:
-
-   ```bash
-   git clone https://github.com/AOROM/paperreading.git
-   cd paperreading
-   python -m pip install -r requirements.txt
-   ```
-
-2. Copy the skill into your Codex skills directory. Windows PowerShell example:
-
-   ```powershell
-   Copy-Item -Recurse -Force `
-     .\skills\papers-reading-skill `
-     "$env:USERPROFILE\.codex\skills\papers-reading-skill"
-   ```
-
-3. Start a new Codex session and invoke `$papers-reading-skill`.
-
-Generate a reviewable draft:
-
-```text
-Use $papers-reading-skill to read this paper into 13 evidence-grounded fields. Separate source claims, reported evidence, and your assessment, but do not write to a workbook.
-```
-
-Append only after validation:
-
-```text
-Use $papers-reading-skill to read this paper. Validate all 13 fields, then append the result to the Chinese worksheet in my configured workbook.
-```
-
-## Safe workbook automation
-
-The public repository contains no personal workbook paths. The writer resolves its target in this order:
-
-1. `--workbook <path>` supplied on the command line;
-2. the `PAPER_READING_WORKBOOK` environment variable;
-3. if neither is available, stop without writing.
-
-PowerShell:
-
-```powershell
-$env:PAPER_READING_WORKBOOK = "D:\research\paper-reading.xlsx"
-```
-
-Bash:
+PaperReading is currently installed from source:
 
 ```bash
-export PAPER_READING_WORKBOOK="/data/research/paper-reading.xlsx"
+git clone https://github.com/AOROM/paperreading.git
+cd paperreading
+python -m pip install -e ".[excel]"
 ```
 
-Call the deterministic writer directly:
+Validate the synthetic example:
+
+```bash
+paperreading validate examples/paper-record.example.json
+paperreading validate examples/paper-record.example.json --strict
+```
+
+Review the backward-compatible 13-field projection:
+
+```bash
+paperreading project examples/paper-record.example.json
+```
+
+Export reviewable artifacts:
+
+```bash
+paperreading export examples/paper-record.example.json review.md --format markdown
+paperreading export examples/paper-record.example.json record.json --format json
+```
+
+Initialize a local research workspace without creating a database:
+
+```bash
+paperreading init
+```
+
+This creates `.paperreading/config.toml` and `.paperreading/papers/`. SQLite, batch ingestion, and search are not presented as implemented features in v0.2.
+
+## The canonical record
+
+The original Excel columns are no longer the internal model:
+
+```text
+PaperRecord
+├── metadata
+├── research_questions
+├── theoretical_framework
+├── data and variables
+├── empirical_design
+├── source_claims -> EvidenceRef[]
+├── findings -> EvidenceRef[]
+├── mechanisms / heterogeneity / robustness
+├── limitations
+├── extensions
+└── researcher_assessment
+```
+
+An evidence reference can identify text, metadata, a table, figure, equation, or appendix:
+
+```json
+{
+  "source_id": "paper-id-or-doi",
+  "type": "TABLE",
+  "page": 12,
+  "section": "4.2 Baseline Results",
+  "table": "Table 3",
+  "column": "(4)"
+}
+```
+
+The committed machine contracts are [`paper.schema.json`](schemas/paper.schema.json) and [`evidence.schema.json`](schemas/evidence.schema.json). See the synthetic [`paper-record.example.json`](examples/paper-record.example.json) for a complete record.
+
+The confidence value measures **traceability specificity**, not whether a statement is true, a coefficient is correctly estimated, or a study is externally valid. In v0.2, the Core can validate the structure of a locator but cannot independently prove that the locator matches an unseen source document.
+
+## Python API
+
+```python
+from pathlib import Path
+
+from paperreading import PaperRecord, to_legacy_13_fields, validate_record
+
+record = PaperRecord.model_validate_json(
+    Path("record.json").read_text(encoding="utf-8")
+)
+report = validate_record(record, strict=True)
+
+if report.valid:
+    legacy_row = to_legacy_13_fields(record)
+```
+
+This API validates and transforms structured records. A future `PaperReader` that performs PDF ingestion is intentionally not advertised before it exists.
+
+## Safe Excel compatibility
+
+Append one validated record to an existing compatible workbook:
+
+```bash
+paperreading export record.json literature.xlsx --format excel --sheet 中文
+```
+
+The workbook must already contain `中文` and `英文` worksheets. The exporter retains the existing safeguards:
+
+- validate the 12- or 13-column header contract;
+- detect duplicates without overwriting them;
+- preserve existing values, formulas, styles, tables, filters, and frozen panes;
+- create a timestamped backup;
+- save to a temporary file and reopen it for validation; and
+- replace the source workbook atomically only after validation succeeds.
+
+The legacy command remains available for existing integrations:
 
 ```bash
 python skills/papers-reading-skill/scripts/append_paper_reading.py \
-  --workbook "/path/to/paper-reading.xlsx" \
+  --workbook literature.xlsx \
   --sheet 中文 \
   --data-json examples/paper-reading.example.json
 ```
 
-Use `--sheet 中文` for a Chinese paper or `--sheet 英文` for an English paper. The script returns `paper_appended`, `duplicate_skipped`, `schema_updated`, or `error` as JSON. A validation or write error leaves the original workbook unchanged.
+The public repository contains no personal workbook path. When the compatibility command omits `--workbook`, it can still use `PAPER_READING_WORKBOOK`.
 
-## Evidence and ranking boundaries
+## Codex Skill
 
-Field definitions live in [`reading-fields.md`](skills/papers-reading-skill/references/reading-fields.md). Source locations are recorded only when they are available from the supplied material; their absence must not be replaced with invented page numbers or quotations.
+Copy `skills/papers-reading-skill` into the Codex skills directory after installing the Core package. Start a new Codex session and invoke `$papers-reading-skill`.
 
-Journal rankings are versioned external evidence. Record only labels confirmed by a reliable source, preserve the source system's wording, and never translate one ranking system into another. For evaluation, promotion, reporting, or submission decisions, verify the applicable system, version, and effective date.
+The Skill now acts as an adapter: it constructs a `PaperRecord`, runs the CLI validator, interprets warnings, and requests permission before any workbook mutation. Detailed runtime contracts are loaded progressively from its references.
 
 ## Project structure
 
 ```text
 paperreading/
-├── skills/papers-reading-skill/   # Installable runtime skill
-│   ├── SKILL.md
-│   ├── agents/openai.yaml
-│   ├── references/
-│   └── scripts/append_paper_reading.py
-├── examples/                      # Synthetic example input
-├── tests/                         # Safety and structure tests
-├── tools/                         # Repository validation
-└── .github/workflows/ci.yml       # Automated validation
+├── src/paperreading/
+│   ├── domain/          # PaperRecord and EvidenceRef
+│   ├── validation/      # Evidence and causal-language checks
+│   ├── projections/     # Legacy 13-field projection
+│   ├── exporters/       # JSON, Markdown, and Excel adapters
+│   └── cli.py
+├── schemas/             # Public JSON Schemas
+├── skills/              # Codex adapter
+├── examples/            # Synthetic records only
+├── tests/               # Core, contract, CLI, and Excel safety tests
+└── tools/               # Skill and schema validation
 ```
 
-Repository documentation, tests, and CI configuration stay outside the runtime skill so they do not consume its context budget.
-
-## Development and validation
+## Development
 
 ```bash
-python -m pip install -r requirements-dev.txt
+python -m pip install -e ".[excel,dev]"
+python -m ruff check .
+python -m ruff format --check .
+python -m mypy
+python tools/export_schemas.py --check
 python tools/validate_skill.py skills/papers-reading-skill
 python -m unittest discover -s tests -v
+python -m pip wheel --no-deps --wheel-dir dist .
 ```
 
-GitHub Actions validates skill metadata and exercises workbook upgrades, duplicate detection, configuration resolution, and failure-safe source preservation.
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a change.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for architecture and compatibility rules. Version sequencing and explicitly deferred capabilities are documented in [ROADMAP.md](ROADMAP.md).
 
 ## License
 

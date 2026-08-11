@@ -9,7 +9,6 @@ from pathlib import Path
 
 import yaml
 
-
 FRONTMATTER_RE = re.compile(r"\A---\r?\n(.*?)\r?\n---\r?\n", re.DOTALL)
 SKILL_NAME_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 RESOURCE_RE = re.compile(r"`((?:references|scripts|assets)/[^`\s]+)`")

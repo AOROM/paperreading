@@ -1,10 +1,14 @@
 __pycache__/
 *.py[cod]
 *.egg-info/
+build/
+dist/
 .pytest_cache/
 .ruff_cache/
+.mypy_cache/
 .venv/
 venv/
+.paperreading/
 
 # Local editor and OS files
 .DS_Store

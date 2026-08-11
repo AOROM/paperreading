@@ -1,2 +1,1 @@
--r requirements.txt
-PyYAML>=6,<7
+-e .[excel,dev]
