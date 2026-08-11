@@ -1,104 +1,149 @@
-# Paper Reading Skill
+# PaperReading
 
 [English](README.md) | **简体中文**
 
 [![CI](https://github.com/AOROM/paperreading/actions/workflows/ci.yml/badge.svg)](https://github.com/AOROM/paperreading/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-面向金融、经济、管理与社会科学论文的 Codex skill。它把论文整理为 13 个可复核字段，区分论文主张、经验证据与研究者判断，提出可执行的后续研究设计，并可安全写入既有 Excel 文献研读表。
+> **把论文变成可检验、可比较、可延伸的研究知识。**
 
-## 核心能力
+PaperReading 是面向**金融、经济、管理、会计与实证社会科学**的 evidence-grounded AI 论文研读工作流。它不止回答“论文讲了什么”，而是围绕研究问题、理论逻辑、识别策略、变量、证据、作用机制、稳健性、研究局限与可执行延伸设计建立结构化记录。
 
-- 按固定顺序提取题名、作者、期刊、等级、时间、关键词、研究问题、结论、研究逻辑、实证模型、数据与变量以及延伸设计。
-- 对基准结果、作用机制、异质性、经济后果、内生性与稳健性检验进行分层表达。
-- 避免把相关关系误写为因果关系，不补造缺失的变量、模型、数据来源或期刊等级。
-- 在兼容的 12 列工作簿中安全补充第 13 列，并保留原有内容、样式、公式、筛选与表格结构。
-- 写入前查重；写入时先保存临时文件并验证，再备份和原子替换原工作簿。
+项目保留现有可安装的 Codex Skill 和安全 Excel 写入能力，同时开始抽离可复用的 Python 核心，用于可审计 Paper Record、Evidence Map、跨论文比较与后续文献综合。
+
+## 为什么是 PaperReading？
+
+多数论文阅读工具优化的是“总结内容”；PaperReading 更关注“为什么这个结论可信，以及下一步还能如何研究”。
+
+```text
+论文 / PDF
+    │
+    ├── Structured Reading ── 13 字段研读体系
+    ├── Evidence Map ──────── 页码 / 章节 / 表格 / 图形证据定位
+    ├── Method Audit ──────── 识别 / 内生性 / 稳健性
+    ├── Literature Matrix ─── 多论文横向比较
+    └── Research Extensions ─ 可执行延伸研究设计
+                │
+                └── Excel / JSON / Markdown / 后续集成
+```
+
+## 当前能力
+
+### 1. Evidence-grounded 13 字段论文研读
+
+现有 Codex Skill 可以按固定结构整理题名、作者、期刊、等级、时间、关键词、研究问题、研究结论、研究逻辑、实证模型、数据与变量以及延伸研究设计。
+
+它会明确区分基准结果、作用机制、异质性、经济后果、内生性处理与稳健性检验，并避免补造缺失变量、模型、期刊等级或不受识别策略支持的因果表述。
+
+### 2. 可审计 Paper Record
+
+新增 `paperreading` Python 包，为论文元数据、实证设计、研究结论与证据定位提供可复用的数据模型。
+
+```python
+from paperreading import EvidenceRef, Finding, PaperRecord
+
+paper = PaperRecord(
+    title="示例论文",
+    research_questions=["X 是否影响 Y？"],
+    findings=[
+        Finding(
+            text="X 与 Y 显著正相关。",
+            category="baseline",
+            evidence=[EvidenceRef(page=12, table="表3", section="4.2")],
+        )
+    ],
+)
+```
+
+### 3. Literature Matrix
+
+多个 `PaperRecord` 可以直接生成跨论文比较矩阵，不依赖 pandas：
+
+```python
+from paperreading import build_literature_matrix, matrix_to_markdown
+
+rows = build_literature_matrix([paper_a, paper_b])
+print(matrix_to_markdown(rows))
+```
+
+矩阵会展示论文、期刊、研究问题、识别策略、核心 X/Y、作用机制、主要结论以及证据覆盖率。
+
+### 4. 安全 Excel 文献研读工作流
+
+原有确定性写入脚本继续保留：在已有工作簿中追加 13 字段记录，同时保留原始值、公式、样式、筛选、Excel Table 与工作簿结构；写入前查重，临时保存后重新验证，创建备份，再原子替换源文件。
 
 ## 项目结构
 
 ```text
 paperreading/
-├── skills/papers-reading-skill/   # 可直接安装的 skill
-│   ├── SKILL.md
-│   ├── agents/openai.yaml
-│   ├── references/
-│   └── scripts/append_paper_reading.py
-├── examples/                      # 示例输入
-├── tests/                         # 端到端与结构测试
-├── tools/                         # 仓库级校验工具
-└── .github/workflows/ci.yml       # 自动校验
+├── paperreading/                   # 可复用 Research Intelligence 核心
+│   ├── models.py                   # Paper / Method / Finding / Evidence 模型
+│   ├── evidence.py                 # Evidence 标签与覆盖率
+│   └── matrix.py                   # 跨论文 Literature Matrix
+├── schemas/paper.schema.json       # Paper Record 可移植契约
+├── skills/papers-reading-skill/    # 可安装 Codex Skill
+├── examples/                       # 结构化示例
+├── docs/                           # 架构与方法文档
+├── tests/                          # Core + Excel 测试
+├── ROADMAP.md
+├── CHANGELOG.md
+└── CITATION.cff
 ```
 
-仓库层文档、测试与 CI 不会进入 skill 的运行上下文；真正需要安装的是 `skills/papers-reading-skill/`。
+## 快速开始
 
-## 安装
-
-1. 克隆仓库并安装脚本依赖：
-
-   ```bash
-   git clone https://github.com/AOROM/paperreading.git
-   cd paperreading
-   python -m pip install -r requirements.txt
-   ```
-
-2. 将 skill 目录复制到 Codex skills 目录。Windows PowerShell 示例：
-
-   ```powershell
-   Copy-Item -Recurse -Force `
-     .\skills\papers-reading-skill `
-     "$env:USERPROFILE\.codex\skills\papers-reading-skill"
-   ```
-
-3. 重新打开 Codex 会话，并通过 `$papers-reading-skill` 显式调用，或使用与论文研读、13 字段整理、文献表写入相关的自然语言请求触发。
-
-## 配置工作簿
-
-公开版本不包含任何个人工作簿路径。写入脚本按以下优先级解析目标文件：
-
-1. 命令行 `--workbook <path>`；
-2. 环境变量 `PAPER_READING_WORKBOOK`；
-3. 两者均不存在时停止写入。
-
-PowerShell：
-
-```powershell
-$env:PAPER_READING_WORKBOOK = "D:\research\paper-reading.xlsx"
-```
-
-Bash：
+### 使用 Codex Skill
 
 ```bash
-export PAPER_READING_WORKBOOK="/data/research/paper-reading.xlsx"
+git clone https://github.com/AOROM/paperreading.git
+cd paperreading
+python -m pip install -r requirements.txt
 ```
 
-## 使用方式
+将 `skills/papers-reading-skill/` 复制到 Codex skills 目录，重新打开 Codex 会话，然后调用 `$papers-reading-skill`，或直接用自然语言要求进行结构化论文研读。
 
-仅生成草稿：
+### 使用 Python Core
 
-```text
-使用 $papers-reading-skill 研读这篇论文，生成 13 个结构化字段，但不要写入工作簿。
+当前核心只依赖 Python 标准库：
+
+```python
+from paperreading import PaperRecord, EmpiricalDesign
+
+paper = PaperRecord(
+    title="Digital finance and firm innovation",
+    authors=["Author A", "Author B"],
+    research_questions=["Does digital finance affect firm innovation?"],
+    empirical_design=EmpiricalDesign(
+        explanatory_variables=["Digital finance"],
+        outcome_variables=["Innovation"],
+        fixed_effects=["Firm", "Year"],
+        identification="Two-way fixed effects",
+    ),
+)
+
+paper.validate()
 ```
 
-写入已配置的工作簿：
+可移植 JSON 示例见 [`examples/paper-record.example.json`](examples/paper-record.example.json)。
 
-```text
-使用 $papers-reading-skill 研读这篇论文；核验字段完整后，写入中文工作表。
-```
+## 设计原则
 
-直接调用确定性写入脚本：
+- **Evidence before fluency**：重要结论优先保证可回查，而不是只追求流畅表述。
+- **因果纪律**：没有足够识别设计时，不把相关关系写成因果关系。
+- **结构化但可移植**：Excel 是导出目标，不再作为唯一底层数据模型。
+- **研究导向延伸**：研究建议应尽量包含可实施的识别策略、样本、变量构造、机制检验、结果变量或证伪设计。
+- **不静默补造**：未知的元数据、等级、方法或证据保持未知。
 
-```bash
-python skills/papers-reading-skill/scripts/append_paper_reading.py \
-  --workbook "/path/to/paper-reading.xlsx" \
-  --sheet 中文 \
-  --data-json examples/paper-reading.example.json
-```
+## Roadmap
 
-中文论文使用 `--sheet 中文`，英文论文使用 `--sheet 英文`。脚本输出 JSON 状态，例如 `paper_appended`、`duplicate_skipped`、`schema_updated` 或 `error`。发生校验错误时，原工作簿保持不变。
+下一阶段见 [`ROADMAP.md`](ROADMAP.md)：
 
-## 字段与期刊等级边界
-
-字段定义见 [`reading-fields.md`](skills/papers-reading-skill/references/reading-fields.md)。期刊等级仅记录经可靠来源确认的原始标签；不同评价体系之间不得推断或换算。涉及当前评价、职称、成果申报或投稿决策时，必须核实适用体系、版本与生效日期。
+- 自动 Evidence 抽取与 Evidence Map；
+- Batch Paper Reading 与更丰富的 Literature Matrix；
+- 跨论文 Research Gap 综合；
+- Markdown / BibTeX / Zotero 导出；
+- Benchmark 与幻觉率、证据准确率指标；
+- 可选 CLI、Agent Adapter 与 Web Demo。
 
 ## 开发与验证
 
@@ -108,10 +153,12 @@ python tools/validate_skill.py skills/papers-reading-skill
 python -m unittest discover -s tests -v
 ```
 
-GitHub Actions 会在推送和拉取请求上验证 skill 元数据，并对 Excel 写入、重复检测、环境变量配置和失败不改源文件等行为执行端到端测试。
+提交前请阅读[中文贡献指南](CONTRIBUTING.zh-CN.md)。功能建议可通过 GitHub Issue Template 提交。
 
-提交变更前，请阅读[中文贡献指南](CONTRIBUTING.zh-CN.md)。
+## 引用
+
+如果 PaperReading 对你的研究工作有帮助，可使用 [`CITATION.cff`](CITATION.cff) 中的引用信息。
 
 ## 许可
 
-本仓库目前未附加开源许可证。公开可见不等于自动授予复制、修改或分发权利。
+MIT License，见 [LICENSE](LICENSE)。

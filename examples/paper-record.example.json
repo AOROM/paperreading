@@ -1,0 +1,42 @@
+{
+  "title": "Digital finance and firm innovation",
+  "authors": ["Author A", "Author B"],
+  "journal": "Example Journal",
+  "journal_rankings": [],
+  "publication_date": "2025",
+  "doi": null,
+  "keywords": ["digital finance", "firm innovation", "financing constraints"],
+  "research_questions": ["Does digital finance affect firm innovation?"],
+  "research_logic": "Digital financial development may reduce financing frictions and improve firms' capacity to invest in innovation.",
+  "empirical_design": {
+    "explanatory_variables": ["Digital finance index"],
+    "outcome_variables": ["Patent applications"],
+    "controls": ["Firm size", "Leverage"],
+    "fixed_effects": ["Firm", "Year"],
+    "model_type": "Panel regression",
+    "identification": "Two-way fixed effects",
+    "endogeneity": ["Alternative specification / instrument if supported by the source"],
+    "robustness": ["Alternative innovation measure"]
+  },
+  "findings": [
+    {
+      "text": "Digital finance is positively associated with firm innovation in the baseline specification.",
+      "category": "baseline",
+      "coefficient": null,
+      "significance": null,
+      "evidence": [
+        {
+          "page": 12,
+          "section": "4.2 Baseline results",
+          "table": "Table 3",
+          "figure": null,
+          "note": "Illustrative sanitized example; not a claim about a real paper."
+        }
+      ]
+    }
+  ],
+  "mechanisms": ["Financing constraints"],
+  "data_sources": ["Illustrative firm-level panel data"],
+  "limitations": ["Illustrative example only"],
+  "extensions": ["Use an externally timed policy shock and a DID design to strengthen causal identification."]
+}

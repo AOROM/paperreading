@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/AOROM/paperreading/schemas/paper.schema.json",
+  "title": "PaperReading PaperRecord",
+  "type": "object",
+  "required": ["title"],
+  "additionalProperties": false,
+  "properties": {
+    "title": {"type": "string", "minLength": 1},
+    "authors": {"type": "array", "items": {"type": "string"}, "default": []},
+    "journal": {"type": ["string", "null"]},
+    "journal_rankings": {"type": "array", "items": {"type": "string"}, "default": []},
+    "publication_date": {"type": ["string", "null"]},
+    "doi": {"type": ["string", "null"]},
+    "keywords": {"type": "array", "items": {"type": "string"}, "default": []},
+    "research_questions": {"type": "array", "items": {"type": "string", "minLength": 1}, "default": []},
+    "research_logic": {"type": ["string", "null"]},
+    "empirical_design": {"$ref": "#/$defs/empiricalDesign"},
+    "findings": {"type": "array", "items": {"$ref": "#/$defs/finding"}, "default": []},
+    "mechanisms": {"type": "array", "items": {"type": "string"}, "default": []},
+    "data_sources": {"type": "array", "items": {"type": "string"}, "default": []},
+    "limitations": {"type": "array", "items": {"type": "string"}, "default": []},
+    "extensions": {"type": "array", "items": {"type": "string"}, "default": []}
+  },
+  "$defs": {
+    "evidenceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "page": {"type": ["integer", "null"], "minimum": 1},
+        "section": {"type": ["string", "null"]},
+        "table": {"type": ["string", "null"]},
+        "figure": {"type": ["string", "null"]},
+        "note": {"type": ["string", "null"]}
+      }
+    },
+    "finding": {
+      "type": "object",
+      "required": ["text"],
+      "additionalProperties": false,
+      "properties": {
+        "text": {"type": "string", "minLength": 1},
+        "category": {"type": "string", "default": "baseline"},
+        "coefficient": {"type": ["string", "null"]},
+        "significance": {"type": ["string", "null"]},
+        "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidenceRef"}, "default": []}
+      }
+    },
+    "empiricalDesign": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "explanatory_variables": {"type": "array", "items": {"type": "string"}, "default": []},
+        "outcome_variables": {"type": "array", "items": {"type": "string"}, "default": []},
+        "controls": {"type": "array", "items": {"type": "string"}, "default": []},
+        "fixed_effects": {"type": "array", "items": {"type": "string"}, "default": []},
+        "model_type": {"type": ["string", "null"]},
+        "identification": {"type": ["string", "null"]},
+        "endogeneity": {"type": "array", "items": {"type": "string"}, "default": []},
+        "robustness": {"type": "array", "items": {"type": "string"}, "default": []}
+      }
+    }
+  }
+}

@@ -1,0 +1,44 @@
+name: Feature request
+description: Propose a new PaperReading capability, integration, schema field, or research workflow.
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: "Please avoid uploading copyrighted full-text papers, confidential data, credentials, or personal workbooks."
+  - type: textarea
+    id: research_problem
+    attributes:
+      label: Research workflow problem
+      description: What research task is difficult or repetitive today?
+      placeholder: "Example: comparing identification strategies across 30 papers requires manual coding."
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_behavior
+    attributes:
+      label: Proposed behavior
+      description: Describe the input, expected output, and where this should live in the workflow.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Structured reading
+        - Evidence grounding
+        - Method audit
+        - Literature Matrix / synthesis
+        - Export / integration
+        - Codex skill
+        - Excel workflow
+        - Documentation / examples
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Example or acceptance criteria
+      description: Provide a sanitized example, expected schema, or concrete success criteria if possible.
