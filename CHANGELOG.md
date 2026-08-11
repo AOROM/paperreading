@@ -8,6 +8,12 @@ All notable changes to PaperReading are documented in this file.
 
 - A bilingual, normative Research Principles contract derived from academic validity, evidence traceability, inference discipline, reproducibility, falsifiability, and research ethics.
 - A principle-based decision gate and research-integrity section in the contribution and pull-request workflows.
+- A repository hero illustration with documented generation provenance.
+
+### Changed
+
+- Reorganized both README versions around a verifiable 60-second trial, audience-specific entry points, explicit capability boundaries, and a compact documentation map.
+- Aligned Python package metadata with the evidence-grounded workflow positioning and added discoverability links and keywords.
 
 ## [0.3.0] - 2026-08-11
 

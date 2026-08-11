@@ -5,9 +5,15 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "paperreading"
 version = "0.3.0"
-description = "Evidence-grounded AI research intelligence core and workflow"
+description = "Evidence-grounded AI research workflow for reviewable paper artifacts"
 readme = "README.md"
 requires-python = ">=3.10"
+keywords = [
+  "academic-research",
+  "evidence-traceability",
+  "literature-review",
+  "reproducibility",
+]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Science/Research",
@@ -37,6 +43,8 @@ paperreading = "paperreading.cli:app"
 Homepage = "https://github.com/AOROM/paperreading"
 Repository = "https://github.com/AOROM/paperreading"
 Issues = "https://github.com/AOROM/paperreading/issues"
+Changelog = "https://github.com/AOROM/paperreading/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/AOROM/paperreading#readme"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -1,34 +1,73 @@
-# PaperReading
+<h1 align="center">PaperReading</h1>
 
-**Evidence-grounded AI research workflow**
+<p align="center">
+  <img src="docs/assets/paperreading-hero.png" width="100%" alt="PaperReading turns source documents into traceable evidence, structured research packages, and explicit verification states.">
+</p>
 
-**English** | [简体中文](README.zh-CN.md)
+<div align="center">
+  <p><strong>Evidence-grounded AI research workflow</strong></p>
+  <p>
+    Turn research material into versioned, reviewable artifacts.<br>
+    Trace claims to evidence. Separate reporting from analysis. Keep uncertainty visible.
+  </p>
+  <p>
+    <a href="https://github.com/AOROM/paperreading/actions/workflows/ci.yml"><img src="https://github.com/AOROM/paperreading/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
+    <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&amp;logoColor=white" alt="Python 3.10 or newer">
+    <img src="https://img.shields.io/badge/version-0.3.0-4C1" alt="Version 0.3.0">
+    <a href="https://github.com/AOROM/paperreading/stargazers"><img src="https://img.shields.io/github/stars/AOROM/paperreading?style=flat&amp;logo=github&amp;label=Stars" alt="GitHub stars"></a>
+  </p>
+  <p><strong>English</strong> · <a href="README.zh-CN.md">简体中文</a></p>
+  <p>
+    <a href="#try-it-in-60-seconds">Quick start</a> ·
+    <a href="#what-ships-in-v03">Capabilities</a> ·
+    <a href="#how-it-works">Architecture</a> ·
+    <a href="RESEARCH_PRINCIPLES.md">Research principles</a> ·
+    <a href="ROADMAP.md">Roadmap</a> ·
+    <a href="CONTRIBUTING.md">Contribute</a>
+  </p>
+</div>
 
-[![CI](https://github.com/AOROM/paperreading/actions/workflows/ci.yml/badge.svg)](https://github.com/AOROM/paperreading/actions/workflows/ci.yml)
-![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB)
-![Version](https://img.shields.io/badge/version-0.3.0-4C1)
+PaperReading is an alpha-stage Python core and Codex Skill for researchers and research-tool builders who need more than a fluent summary. Its schemas and validators preserve the chain from a source location to a claim, distinguish paper-reported content from later interpretation, guard causal language, and keep legacy research exports reviewable.
 
-PaperReading turns research material into versioned, reviewable artifacts. It keeps statements grounded in source locations, separates paper-reported facts from researcher analysis, checks whether evidence can be resolved against an ingested document, and preserves the existing 13-field Excel workflow.
+> [!IMPORTANT]
+> **Current scope:** v0.3 ingests UTF-8 text and Markdown, migrates v0.2 records, normalizes evidence by stable ID, and verifies text locators and quotations. It does **not** yet parse PDFs, call an AI provider, run batch jobs, search a SQLite library, synthesize multiple papers, or discover research gaps automatically.
 
-> Current boundary: v0.3 ingests UTF-8 text and Markdown, migrates v0.2 records, normalizes evidence by stable ID, and verifies text locators and quotations. It does **not** yet parse PDFs, call an AI provider, run batch jobs, search a SQLite library, synthesize multiple papers, or discover research gaps automatically.
+## From fluent summaries to defensible research artifacts
 
-## Why PaperReading
+| Research requirement | PaperReading rule |
+|---|---|
+| Traceability | Claims reference de-duplicated evidence spans with source and locator metadata |
+| Epistemic separation | Paper-reported content and researcher or AI-assisted analysis live in different objects |
+| Inference discipline | Causal wording requires an eligible design and an explicit identification strategy |
+| Explicit uncertainty | Verification returns `verified`, `partial`, or `failed`; migration never implies source checking |
+| Reproducibility | Versioned schemas, run metadata, deterministic migrations, and inspectable local files preserve provenance |
+| Compatibility | JSON, Markdown, legacy 13-field projection, and safe Excel append share one validated domain model |
 
-A fluent summary is not the same as a defensible research asset. A reliable workflow must retain enough structure to answer:
+These rules make five questions answerable: what the paper reported, where the supporting evidence lives, whether that locator was checked, what the design permits us to infer, and how the artifact changed over time.
 
-- Which statements are reported by the paper, and which are later interpretation?
-- Which page, section, block, table, figure, equation, or quotation supports a claim?
-- Was a locator actually checked against the supplied source?
-- Does the empirical design justify causal wording?
-- Can an artifact evolve without silently breaking earlier records or Excel workflows?
+## Try it in 60 seconds
 
-PaperReading turns these questions into explicit schemas, validation rules, migration paths, and failure behavior.
+Clone the repository, install the Core package, and validate the checked-in research package:
 
-## Research constitution
+```bash
+git clone https://github.com/AOROM/paperreading.git
+cd paperreading
+python -m pip install -e .
+paperreading validate examples/paper-package.example.json
+```
 
-The normative [Research Principles](RESEARCH_PRINCIPLES.md) derive the project's decision rules from academic validity, traceability, falsifiability, reproducibility, and research ethics. They take precedence over compatibility, convenience, performance, and growth metrics. A capability that cannot state its research object, evidence, inference boundary, uncertainty, and failure behavior is not ready to ship.
+The fixture returns `valid: true`, `evidence_count: 4`, and `finding_count: 1`. It also returns four explicit `EVIDENCE_NOT_VERIFIED` warnings because the example was migrated from v0.2 and has not been checked against source content. That visible limitation is part of the contract, not hidden noise.
 
-## What is implemented
+| If you want to… | Start here |
+|---|---|
+| Evaluate the artifact model | [`examples/paper-package.example.json`](examples/paper-package.example.json) and [versioned schemas](schemas/v0.3) |
+| Use the Codex workflow | [`skills/papers-reading-skill`](skills/papers-reading-skill) |
+| Integrate from Python | [Python API](#python-api) |
+| Preserve an Excel workflow | [Safe Excel compatibility](#safe-excel-compatibility) |
+| Understand research safeguards | [Research Principles](RESEARCH_PRINCIPLES.md) |
+| Help shape the project | [Roadmap](ROADMAP.md) and [contribution guide](CONTRIBUTING.md) |
+
+## What ships in v0.3
 
 | Capability | Status | Public contract |
 |---|---|---|
@@ -41,9 +80,9 @@ The normative [Research Principles](RESEARCH_PRINCIPLES.md) derive the project's
 | Causal-language guard | Implemented | Causal wording requires an eligible design and an explicit identification strategy |
 | Export and compatibility | Implemented | Lossless JSON, reviewable Markdown, legacy 13-field projection, and safe Excel append |
 | Local project storage | Implemented | Atomic, inspectable JSON files under `.paperreading/`; no database required |
-| PDF/provider/batch/search/synthesis/gaps | Planned | Sequenced in the [roadmap](ROADMAP.md) and never presented as shipped |
+| PDF / provider / batch / search / synthesis / gaps | Planned | Sequenced in the [roadmap](ROADMAP.md) and never presented as shipped |
 
-## Architecture
+## How it works
 
 ```mermaid
 flowchart LR
@@ -70,13 +109,15 @@ domain <- migrations / ingestion / verification / validation / projections
 
 The domain layer imports no Typer, OpenPyXL, model SDK, storage adapter, or Codex runtime. File storage and Excel are replaceable adapters; the schemas remain the center of the system.
 
-## Quick start
+## Research constitution
 
-Install from source:
+The normative [Research Principles](RESEARCH_PRINCIPLES.md) derive project decisions from academic validity, traceability, falsifiability, reproducibility, and research ethics. They take precedence over compatibility, convenience, performance, and growth metrics. A capability that cannot state its research object, evidence, inference boundary, uncertainty, and failure behavior is not ready to ship.
+
+## Explore the command workflow
+
+Install Excel support only when it is needed:
 
 ```bash
-git clone https://github.com/AOROM/paperreading.git
-cd paperreading
 python -m pip install -e ".[excel]"
 ```
 
@@ -88,20 +129,20 @@ paperreading init
 
 This creates `.paperreading/config.toml`, a manifest, and separate directories for documents, drafts, records, analyses, audits, and cache data.
 
-Ingest the synthetic Markdown source:
+Exercise the source-ingestion contract with the synthetic Markdown fixture:
 
 ```bash
 paperreading ingest examples/source.example.md
 ```
 
-Migrate the synthetic v0.2 record without mutating the project:
+Exercise deterministic v0.2 migration without mutating the project:
 
 ```bash
 paperreading migrate examples/paper-record.example.json \
   --output paper-package.json
 ```
 
-Validate and export either version:
+Validate, export, and project either version:
 
 ```bash
 paperreading validate examples/paper-record.example.json
@@ -119,7 +160,7 @@ paperreading verify package.json \
   --output verified-package.json
 ```
 
-In v0.3, a Skill or another extraction adapter constructs that source-linked package. PaperReading itself does not yet infer a complete research record from arbitrary prose.
+The checked-in ingestion and migration examples exercise separate contracts; they are not automatically linked. In v0.3, a Skill or another extraction adapter constructs the source-linked package. PaperReading itself does not yet infer a complete research record from arbitrary prose.
 
 ## The v0.3 artifact model
 
@@ -219,11 +260,22 @@ Copy [`skills/papers-reading-skill`](skills/papers-reading-skill) into the Codex
 
 The Skill is an adapter, not a second implementation. It respects the supplied source boundary, constructs a source-grounded package or compatible v0.2 record, runs Core validation, reports uncertainty, and requests authorization before workbook mutation.
 
+## Documentation map
+
+| Document | Purpose |
+|---|---|
+| [Research Principles](RESEARCH_PRINCIPLES.md) | Normative rules for validity, evidence, inference, uncertainty, reproducibility, and ethics |
+| [Roadmap](ROADMAP.md) | Shipped boundaries, planned hypotheses, milestones, and release gates |
+| [Contribution guide](CONTRIBUTING.md) | Architecture, schema evolution, compatibility, testing, and research-integrity checks |
+| [Security policy](SECURITY.md) | Private vulnerability-reporting guidance and supported-version policy |
+| [Changelog](CHANGELOG.md) | Versioned record of public capability and compatibility changes |
+
 ## Project structure
 
 ```text
 paperreading/
 ├── RESEARCH_PRINCIPLES*.md # Bilingual academic-research contract
+├── docs/assets/            # Repository presentation assets and provenance
 ├── src/paperreading/
 │   ├── domain/          # v0.2 and v0.3 strict models
 │   ├── ingestion/       # deterministic text/Markdown parser
@@ -255,7 +307,7 @@ python -m unittest discover -s tests -v
 python -m pip wheel --no-deps --wheel-dir dist .
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for architecture, schema-evolution, compatibility, and data-safety rules. See [ROADMAP.md](ROADMAP.md) for the boundary between shipped behavior and planned hypotheses. Security reports follow [SECURITY.md](SECURITY.md).
+If this direction is useful to your research workflow, consider [starring the repository](https://github.com/AOROM/paperreading), opening an issue with a reproducible case, or contributing through [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 

@@ -1,34 +1,77 @@
-# PaperReading
+<h1 align="center">PaperReading</h1>
 
-**Evidence-grounded AI research workflow｜证据约束的 AI 研究工作流**
+<p align="center">
+  <img src="docs/assets/paperreading-hero.png" width="100%" alt="PaperReading 将来源文档转化为可追溯证据、结构化研究包和显式核验状态。">
+</p>
 
-[English](README.md) | **简体中文**
+<div align="center">
+  <p><strong>证据约束的 AI 研究工作流</strong></p>
+  <p>
+    将研究材料转化为可版本化、可复核的研究资产。<br>
+    让主张指向证据，让报告与分析分离，让不确定性保持可见。
+  </p>
+  <p>
+    <a href="https://github.com/AOROM/paperreading/actions/workflows/ci.yml"><img src="https://github.com/AOROM/paperreading/actions/workflows/ci.yml/badge.svg" alt="CI 状态"></a>
+    <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&amp;logoColor=white" alt="Python 3.10 或更高版本">
+    <img src="https://img.shields.io/badge/version-0.3.0-4C1" alt="版本 0.3.0">
+    <a href="https://github.com/AOROM/paperreading/stargazers"><img src="https://img.shields.io/github/stars/AOROM/paperreading?style=flat&amp;logo=github&amp;label=Stars" alt="GitHub Stars"></a>
+  </p>
+  <p><a href="README.md">English</a> · <strong>简体中文</strong></p>
+  <p>
+    <a href="#quick-start">快速开始</a> ·
+    <a href="#capabilities">能力边界</a> ·
+    <a href="#architecture">工作原理</a> ·
+    <a href="RESEARCH_PRINCIPLES.zh-CN.md">研究原则</a> ·
+    <a href="ROADMAP.zh-CN.md">路线图</a> ·
+    <a href="CONTRIBUTING.zh-CN.md">参与贡献</a>
+  </p>
+</div>
 
-[![CI](https://github.com/AOROM/paperreading/actions/workflows/ci.yml/badge.svg)](https://github.com/AOROM/paperreading/actions/workflows/ci.yml)
-![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB)
-![Version](https://img.shields.io/badge/version-0.3.0-4C1)
+PaperReading 是一个处于 Alpha 阶段的 Python Core 与 Codex Skill，面向不满足于“流畅摘要”的研究者和研究工具开发者。它通过 Schema 与校验器保留从来源位置到研究主张的链路，区分论文报告内容与后续分析，约束因果语言，并让旧有研究导出继续保持可复核。
 
-PaperReading 将研究材料转化为可版本化、可复核的研究资产。它要求陈述与来源位置绑定，分离论文报告事实与研究者分析，检查证据能否在已摄取的文档中被解析，并保留现有 13 字段 Excel 工作流。
+> [!IMPORTANT]
+> **当前范围：**v0.3 支持 UTF-8 文本与 Markdown 摄取、v0.2 记录迁移、稳定 ID 证据规范化，以及正文位置和引文核验。它目前**不支持** PDF 解析、AI Provider 自动调用、批处理、SQLite 文献库搜索、多论文综合或自动研究缺口发现。
 
-> 当前边界：v0.3 支持 UTF-8 文本与 Markdown 摄取、v0.2 记录迁移、稳定 ID 证据规范化，以及正文位置和引文核验。它目前**不支持** PDF 解析、AI Provider 自动调用、批处理、SQLite 文献库搜索、多论文综合或自动研究缺口发现。
+## 从流畅摘要到可辩护的研究资产
 
-## 为什么需要 PaperReading
+| 学术研究要求 | PaperReading 的规则 |
+|---|---|
+| 可追溯 | 主张引用去重后的证据片段，并保留来源与位置元数据 |
+| 认识论分离 | 论文报告内容与研究者或 AI 辅助分析存放在不同对象中 |
+| 推断纪律 | 因果表述必须具备合格研究设计与明确识别策略 |
+| 显式不确定性 | 核验返回 `verified`、`partial` 或 `failed`；迁移不冒充来源核对 |
+| 可复现 | 版本化 Schema、运行元数据、确定性迁移与可检查本地文件共同保留溯源 |
+| 向后兼容 | JSON、Markdown、旧版 13 字段投影与安全 Excel 追加共享同一套已校验领域模型 |
 
-流畅的摘要不等于可辩护的研究资产。可靠工作流必须保留足够结构，以回答：
+这些规则使五个问题可以被回答：论文报告了什么、证据位于哪里、位置是否经过核对、研究设计允许何种推断，以及研究资产如何随时间变化。
 
-- 哪些陈述由论文报告，哪些属于后续解释？
-- 哪个页码、章节、文本块、表格、图形、方程或引文支持某项主张？
-- 某个来源位置是否真正与所提供的文档核对过？
-- 实证设计是否足以支持因果表述？
-- 研究资产能否演进，同时不静默破坏旧记录或 Excel 工作流？
+<a id="quick-start"></a>
 
-PaperReading 将这些问题转化为显式 Schema、校验规则、迁移路径和失败行为。
+## 60 秒快速体验
 
-## 研究宪章
+克隆仓库、安装 Core 包，并校验仓库内置的研究包：
 
-规范性文档[《学术研究底层逻辑》](RESEARCH_PRINCIPLES.zh-CN.md)从学术有效性、可追溯性、可证伪性、可复现性和研究伦理出发，推导项目决策规则。其优先级高于兼容性、便利性、性能和增长指标。无法说明研究对象、证据、推断边界、不确定性和失败行为的能力，不得作为正式功能交付。
+```bash
+git clone https://github.com/AOROM/paperreading.git
+cd paperreading
+python -m pip install -e .
+paperreading validate examples/paper-package.example.json
+```
 
-## 已实现能力
+该示例会返回 `valid: true`、`evidence_count: 4` 与 `finding_count: 1`，同时明确给出 4 条 `EVIDENCE_NOT_VERIFIED` 警告，因为示例由 v0.2 迁移而来，尚未与来源正文核对。这个可见的局限属于研究契约，而不是应被隐藏的噪声。
+
+| 如果你希望…… | 建议从这里开始 |
+|---|---|
+| 评估研究资产模型 | [`examples/paper-package.example.json`](examples/paper-package.example.json) 与[版本化 Schema](schemas/v0.3) |
+| 使用 Codex 工作流 | [`skills/papers-reading-skill`](skills/papers-reading-skill) |
+| 从 Python 集成 | [Python API](#python-api) |
+| 保留既有 Excel 工作流 | [安全 Excel 兼容](#安全-excel-兼容) |
+| 理解研究安全边界 | [《学术研究底层逻辑》](RESEARCH_PRINCIPLES.zh-CN.md) |
+| 参与项目建设 | [路线图](ROADMAP.zh-CN.md)与[贡献指南](CONTRIBUTING.zh-CN.md) |
+
+<a id="capabilities"></a>
+
+## v0.3 已交付能力
 
 | 能力 | 状态 | 公开契约 |
 |---|---|---|
@@ -43,7 +86,9 @@ PaperReading 将这些问题转化为显式 Schema、校验规则、迁移路径
 | 本地项目存储 | 已实现 | `.paperreading/` 下的原子化、可检查 JSON 文件，无需数据库 |
 | PDF / Provider / 批处理 / 搜索 / 综合 / Gap | 规划中 | 按[路线图](ROADMAP.zh-CN.md)排序，绝不描述为已经交付 |
 
-## 架构
+<a id="architecture"></a>
+
+## 工作原理
 
 ```mermaid
 flowchart LR
@@ -70,13 +115,15 @@ domain <- migrations / ingestion / verification / validation / projections
 
 Domain 层不导入 Typer、OpenPyXL、模型 SDK、存储适配器或 Codex Runtime。文件存储和 Excel 都是可替换适配器，Schema 才是系统中心。
 
-## 快速开始
+## 研究宪章
 
-从源码安装：
+规范性文档[《学术研究底层逻辑》](RESEARCH_PRINCIPLES.zh-CN.md)从学术有效性、可追溯性、可证伪性、可复现性和研究伦理出发推导项目决策规则。其优先级高于兼容性、便利性、性能和增长指标。无法说明研究对象、证据、推断边界、不确定性和失败行为的能力，不得作为正式功能交付。
+
+## 探索命令工作流
+
+只有需要 Excel 能力时才安装对应可选依赖：
 
 ```bash
-git clone https://github.com/AOROM/paperreading.git
-cd paperreading
 python -m pip install -e ".[excel]"
 ```
 
@@ -88,20 +135,20 @@ paperreading init
 
 该命令会创建 `.paperreading/config.toml`、清单文件，以及彼此独立的 documents、drafts、records、analyses、audits 和 cache 目录。
 
-摄取合成 Markdown 来源：
+使用合成 Markdown 示例测试来源摄取契约：
 
 ```bash
 paperreading ingest examples/source.example.md
 ```
 
-在不修改项目的情况下迁移合成 v0.2 记录：
+在不修改项目的情况下测试确定性的 v0.2 迁移：
 
 ```bash
 paperreading migrate examples/paper-record.example.json \
   --output paper-package.json
 ```
 
-校验并导出任一版本：
+校验、导出并投影任一版本：
 
 ```bash
 paperreading validate examples/paper-record.example.json
@@ -119,7 +166,7 @@ paperreading verify package.json \
   --output verified-package.json
 ```
 
-在 v0.3 中，Skill 或其他提取适配器负责构造与来源关联的研究包。PaperReading 本身还不会从任意文本自动推断完整研究记录。
+仓库内置的摄取示例与迁移示例用于测试不同契约，二者不会自动关联。在 v0.3 中，Skill 或其他提取适配器负责构造与来源关联的研究包；PaperReading 本身还不会从任意文本自动推断完整研究记录。
 
 ## v0.3 研究资产模型
 
@@ -219,11 +266,22 @@ paperreading export package.json literature.xlsx --format excel --sheet 中文
 
 Skill 是适配器，而不是第二套实现。它尊重用户提供的来源边界，构造来源约束的研究包或兼容 v0.2 记录，运行 Core 校验，报告不确定性，并在修改工作簿前请求授权。
 
+## 文档导航
+
+| 文档 | 用途 |
+|---|---|
+| [《学术研究底层逻辑》](RESEARCH_PRINCIPLES.zh-CN.md) | 有效性、证据、推断、不确定性、可复现性与伦理的规范性规则 |
+| [路线图](ROADMAP.zh-CN.md) | 已交付边界、规划假说、里程碑与发布门禁 |
+| [贡献指南](CONTRIBUTING.zh-CN.md) | 架构、Schema 演进、兼容性、测试与研究诚信检查 |
+| [安全策略](SECURITY.md) | 漏洞私密报告方式与受支持版本策略 |
+| [变更日志](CHANGELOG.md) | 公开能力与兼容性变化的版本化记录 |
+
 ## 项目结构
 
 ```text
 paperreading/
 ├── RESEARCH_PRINCIPLES*.md # 中英文规范性学术研究契约
+├── docs/assets/            # 仓库展示资产及其溯源说明
 ├── src/paperreading/
 │   ├── domain/          # v0.2 与 v0.3 严格模型
 │   ├── ingestion/       # 确定性文本 / Markdown 解析器
@@ -255,7 +313,7 @@ python -m unittest discover -s tests -v
 python -m pip wheel --no-deps --wheel-dir dist .
 ```
 
-架构、Schema 演进、兼容性和数据安全规则见[中文贡献指南](CONTRIBUTING.zh-CN.md)。已交付行为与规划假说的边界见[中文路线图](ROADMAP.zh-CN.md)。安全问题请遵循 [SECURITY.md](SECURITY.md)。
+如果这一方向对你的研究工作流有价值，欢迎为[仓库加星](https://github.com/AOROM/paperreading)、提交包含可复现案例的 Issue，或按照[中文贡献指南](CONTRIBUTING.zh-CN.md)参与建设。
 
 ## 许可
 
