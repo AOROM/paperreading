@@ -11,8 +11,10 @@ Describe the Core schema, validation, projection, exporter, Skill, or documentat
 - [ ] `python -m ruff check .` and `python -m ruff format --check .`
 - [ ] `python -m mypy`
 - [ ] `python tools/export_schemas.py --check`
+- [ ] `python tools/generate_examples.py --check`
 - [ ] `python tools/validate_skill.py skills/papers-reading-skill`
 - [ ] `python -m unittest discover -s tests -v`
+- [ ] v0.3 evidence IDs, verification state, and analysis boundaries remain valid
 - [ ] Legacy Excel behavior remains compatible or the migration is documented
 - [ ] No confidential papers, workbooks, credentials, or personal paths are included
 - [ ] External reference changes identify their source and policy version

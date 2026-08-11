@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "paperreading"
-version = "0.2.0"
+version = "0.3.0"
 description = "Evidence-grounded AI research intelligence core and workflow"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -18,6 +18,7 @@ classifiers = [
 ]
 dependencies = [
   "pydantic>=2.13,<2.14",
+  "tomli>=2,<3; python_version < '3.11'",
   "typer>=0.20,<0.21",
 ]
 

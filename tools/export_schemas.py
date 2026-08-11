@@ -12,11 +12,33 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from paperreading.domain import EvidenceRef, PaperRecord  # noqa: E402
+from paperreading.domain import (  # noqa: E402
+    EvidenceRef,
+    EvidenceSpan,
+    PaperDocument,
+    PaperDraft,
+    PaperPackage,
+    PaperRecord,
+)
 
 SCHEMAS = {
+    # Stable root aliases.  The v0.2 names remain backward compatible.
     ROOT / "schemas" / "paper.schema.json": PaperRecord.model_json_schema,
     ROOT / "schemas" / "evidence.schema.json": EvidenceRef.model_json_schema,
+    ROOT / "schemas" / "package.schema.json": PaperPackage.model_json_schema,
+    ROOT / "schemas" / "document.schema.json": PaperDocument.model_json_schema,
+    ROOT / "schemas" / "draft.schema.json": PaperDraft.model_json_schema,
+    ROOT / "schemas" / "evidence-span.schema.json": EvidenceSpan.model_json_schema,
+    # Immutable versioned contracts.
+    ROOT / "schemas" / "v0.2" / "paper.schema.json": PaperRecord.model_json_schema,
+    ROOT / "schemas" / "v0.2" / "evidence.schema.json": EvidenceRef.model_json_schema,
+    ROOT / "schemas" / "v0.3" / "package.schema.json": PaperPackage.model_json_schema,
+    ROOT / "schemas" / "v0.3" / "document.schema.json": PaperDocument.model_json_schema,
+    ROOT / "schemas" / "v0.3" / "draft.schema.json": PaperDraft.model_json_schema,
+    ROOT
+    / "schemas"
+    / "v0.3"
+    / "evidence-span.schema.json": EvidenceSpan.model_json_schema,
 }
 
 

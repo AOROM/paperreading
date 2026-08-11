@@ -18,28 +18,31 @@ Thank you for improving PaperReading. Contributions must preserve evidence trace
 The allowed dependency direction is:
 
 ```text
-domain <- validation / projections <- application interfaces / exporters
+domain <- migrations / ingestion / verification / validation / projections
+       <- application use cases <- CLI / Skill / exporters / repositories
 ```
 
 - `src/paperreading/domain/` must not import Typer, OpenPyXL, an AI SDK, Codex, storage, or an exporter.
 - Put workbook-specific logic only in `src/paperreading/exporters/excel.py`.
-- Put CLI behavior only in `src/paperreading/cli.py`; reusable behavior belongs below the interface layer.
-- Treat `PaperRecord` as the canonical model. Do not add an Excel column directly to the domain contract.
+- Put CLI behavior only in `src/paperreading/cli.py`; reusable orchestration belongs in `application/`, and replaceable persistence belongs behind `repositories/base.py`.
+- Treat v0.3 `PaperPackage` as the current research asset. Preserve v0.2 `PaperRecord` as a supported compatibility contract.
+- Keep source-derived fields in `GroundedPaperRecord`; researcher or AI-assisted interpretation belongs in `ResearchAnalysis`.
 - Implement legacy workbook changes through `to_legacy_13_fields` and retain compatibility tests.
 - Keep the Codex runtime Skill concise. Detailed contracts belong in its references, and deterministic behavior belongs in the Core.
 - Do not create empty placeholder modules for roadmap features.
 
 ## Schema changes
 
-When changing `PaperRecord` or `EvidenceRef`:
+When changing a public domain model or evidence contract:
 
-1. Assess whether the change is backward compatible.
-2. Add or update model and failure-path tests.
-3. Regenerate schemas with `python tools/export_schemas.py`.
-4. Update the synthetic example and relevant documentation.
-5. Record the behavior in `CHANGELOG.md` and describe migration impact in the pull request.
+1. Determine whether the change is backward compatible within its schema version.
+2. If it is not, introduce a new version and an explicit deterministic migration; never reinterpret old JSON silently.
+3. Add model, unresolved-reference, migration, round-trip, and failure-path tests as applicable.
+4. Regenerate schemas with `python tools/export_schemas.py` and examples with `python tools/generate_examples.py`.
+5. Preserve immutable contracts under `schemas/v0.2/` or `schemas/v0.3/`; root schema files are documented aliases.
+6. Update both documentation languages and record migration impact in `CHANGELOG.md` and the pull request.
 
-Confidence scoring rules must remain deterministic and explainable. A caller-supplied confidence value must never bypass repository rules.
+Traceability and confidence rules must remain deterministic and explainable. A caller-supplied value must never bypass repository rules. These scores must not be described as truth, study quality, causal validity, or external validity.
 
 ## Scope and data safety
 
@@ -65,12 +68,13 @@ python -m ruff check .
 python -m ruff format --check .
 python -m mypy
 python tools/export_schemas.py --check
+python tools/generate_examples.py --check
 python tools/validate_skill.py skills/papers-reading-skill
 python -m unittest discover -s tests -v
 python -m pip wheel --no-deps --wheel-dir dist .
 ```
 
-Workbook changes must cover successful append, duplicate no-op, schema mismatch with unchanged source, backup creation, and explicit or configured destination resolution. Core changes must cover schema rejection, evidence provenance, causal-language boundaries, projection compatibility, and exporter failure behavior where applicable.
+Workbook changes must cover successful append, duplicate no-op, schema mismatch with unchanged source, backup creation, and explicit or configured destination resolution. Core changes must cover schema rejection, unresolved evidence IDs, source-content verification states, causal-language boundaries, version migration, projection compatibility, and exporter failure behavior where applicable.
 
 ## Pull requests
 

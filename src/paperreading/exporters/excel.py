@@ -20,7 +20,7 @@ from openpyxl.utils import get_column_letter, range_boundaries
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.worksheet.table import TableColumn
 
-from paperreading.domain import PaperRecord
+from paperreading.artifacts import ResearchArtifact
 from paperreading.exporters.base import ExportResult
 from paperreading.projections import LEGACY_FIELDS, to_legacy_13_fields
 
@@ -370,16 +370,16 @@ def export_legacy_payload(
 
 
 class ExcelExporter:
-    """Project one PaperRecord and append it through the safe legacy writer."""
+    """Project one research artifact through the safe legacy writer."""
 
     def export(
         self,
-        records: list[PaperRecord],
+        records: list[ResearchArtifact],
         destination: Path,
         **options: object,
     ) -> ExportResult:
         if len(records) != 1:
-            raise ValueError("Excel export currently accepts exactly one PaperRecord")
+            raise ValueError("Excel export currently accepts exactly one artifact")
         sheet = str(options.get("sheet", "中文"))
         payload: dict[str, object] = to_legacy_13_fields(records[0])
         return export_legacy_payload(destination, payload, sheet=sheet)

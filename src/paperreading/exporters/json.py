@@ -1,11 +1,11 @@
-"""Lossless JSON export for PaperRecord objects."""
+"""Lossless JSON export for versioned PaperReading artifacts."""
 
 from __future__ import annotations
 
 import json
 from pathlib import Path
 
-from paperreading.domain import PaperRecord
+from paperreading.artifacts import ResearchArtifact
 from paperreading.exporters.base import ExportResult
 from paperreading.exporters.text import atomic_write_text
 
@@ -13,7 +13,7 @@ from paperreading.exporters.text import atomic_write_text
 class JsonExporter:
     def export(
         self,
-        records: list[PaperRecord],
+        records: list[ResearchArtifact],
         destination: Path,
         **options: object,
     ) -> ExportResult:

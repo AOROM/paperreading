@@ -1,65 +1,94 @@
 ---
 name: papers-reading-skill
-description: Evidence-grounded AI research workflow for converting supplied finance, economics, management, and social-science papers into strict PaperRecord JSON, binding claims and findings to source locators, validating causal language with the PaperReading CLI, projecting the legacy 13 fields, and exporting JSON, Markdown, or safe Excel rows. Use when Codex needs to read or review a paper, extract metadata, questions, theory, variables, empirical methods, findings, mechanisms, robustness, limitations, or research extensions, or update a literature-review workbook without damaging existing content.
+description: Evidence-grounded AI research workflow for turning supplied economics, finance, management, and social-science papers or structured records into versioned PaperReading artifacts. Use when Codex must ingest text or Markdown, separate source-grounded claims from researcher analysis, bind findings to evidence IDs and locators, migrate v0.2 PaperRecord JSON, validate or verify a v0.3 PaperPackage, generate research extensions, export reviewable JSON or Markdown, or safely update a compatible 13-field literature workbook.
 ---
 
 # PaperReading Core Adapter
 
 ## Workflow
 
-1. Establish the supplied source boundary and identify available title, author, journal, date, DOI, page, section, table, figure, equation, and appendix metadata.
-2. Read the abstract and introduction, theory or hypotheses, data and variables, research design, baseline results, mechanisms, heterogeneity, robustness or endogeneity checks, conclusion, and relevant appendix material.
-3. Build one canonical `PaperRecord` using `references/paper-record.md`. Keep source claims, reported findings, and researcher assessment in their separate model fields.
-4. Save the record as UTF-8 JSON, then run `paperreading validate <record.json>`. Use `--strict` when every evidence item must carry a structural locator.
-5. Resolve every validation error before export. Preserve warnings in the review handoff instead of silently strengthening the source evidence.
-6. Produce the user-selected output through the CLI. Use `references/reading-fields.md` only when reviewing the legacy 13-field projection or its workbook style.
+1. Establish the supplied-source boundary. Identify which title, author, journal, date, DOI, page, section, table, figure, equation, appendix, and full-text surfaces are actually available.
+2. For UTF-8 text or Markdown, run `paperreading ingest <source> --output <document.json>`. Use the resulting source, section, block, character-range, and hash metadata; do not invent locators.
+3. Read the abstract and introduction, theory or hypotheses, data and variables, research design, baseline results, mechanisms, heterogeneity, robustness or endogeneity checks, conclusion, and relevant appendix material.
+4. Build a v0.3 `PaperPackage` using `references/paper-record.md`. Keep `GroundedPaperRecord`, `EvidenceSpan`, and `ResearchAnalysis` conceptually and structurally separate.
+5. For an existing v0.2 record, run `paperreading migrate <record.json> --output <package.json>` rather than rewriting it manually. Preserve the resulting migration notes and unverified state.
+6. Run `paperreading validate <package.json>`. When a matching `PaperDocument` exists, also run `paperreading verify <package.json> --document <document.json> --strict --output <verified.json>`.
+7. Resolve every validation error before export. Keep partial or failed verification visible; never upgrade a package to verified by assertion.
+8. Produce only the user-selected output. Load `references/reading-fields.md` when reviewing the legacy 13-field projection or workbook style.
 
 ## Evidence protocol
 
-- Record a source claim only when the paper explicitly states it and bind it to at least one `EvidenceRef`.
-- Record a finding only when the supplied text, table, figure, equation, or appendix supports it.
-- Keep researcher assessment separate from both source claims and reported findings.
-- Preserve null results, caveats, sample limits, identification limits, and unresolved information.
-- Never fabricate a quotation, page, section, table, column, figure, equation, appendix, variable, model, test, ranking, or causal claim.
-- Treat confidence as rule-derived output from evidence specificity. Do not invent or manually inflate a confidence score.
+- Record a source claim only when the paper explicitly states it and bind it to at least one evidence ID.
+- Record a finding only when supplied text, table, figure, equation, or appendix material supports it.
+- Keep researcher or AI-assisted assessment outside the source-grounded record.
+- Preserve null results, caveats, sample limits, identification limits, conflicts, and unresolved fields.
+- Never fabricate a quotation, page, section, block, table, column, figure, equation, appendix, variable, model, test, ranking, or causal claim.
+- Treat traceability as locator specificity, not truth, study quality, causal validity, or external validity.
+- Treat source-content verification as a resolution check against the supplied document, not proof that the paper's methods or conclusions are correct.
 - Do not translate one journal-ranking system into another. Record only independently verified labels with their source and version boundary.
+
+## Causal and analysis boundaries
+
+- Use causal language only when an eligible design and an explicit identification strategy support it.
+- Preserve stronger wording made by the paper as a source claim when necessary, but keep the PaperReading assessment and caveats separate.
+- Put proposed research extensions in `ResearchAnalysis`; never present them as paper findings.
+- Ground each extension in a reported limitation, evidence boundary, contradiction, or identification constraint, and include at least one executable design element.
 
 ## CLI operations
 
-Validate the canonical record:
+Initialize a local project and ingest a supported source:
 
 ```bash
-paperreading validate record.json
+paperreading init
+paperreading ingest source.md --output document.json
 ```
 
-Review the backward-compatible 13-field projection without changing a workbook:
+Migrate a v0.2 record:
 
 ```bash
-paperreading project record.json
+paperreading migrate record.json --output package.json
 ```
 
-Export a reviewable artifact:
+Validate and, when the matching document exists, verify a v0.3 package:
 
 ```bash
-paperreading export record.json review.md --format markdown
-paperreading export record.json record.normalized.json --format json
+paperreading validate package.json
+paperreading verify package.json \
+  --document document.json \
+  --strict \
+  --output verified-package.json
 ```
 
-Append to an existing compatible workbook only after the user authorizes that destination:
+Review or export without changing a workbook:
 
 ```bash
-paperreading export record.json literature.xlsx --format excel --sheet 中文
+paperreading project package.json
+paperreading export package.json review.md --format markdown
+paperreading export package.json package.normalized.json --format json
 ```
 
-The legacy `scripts/append_paper_reading.py` entry point remains a compatibility wrapper for existing 13-field JSON payloads. Prefer the CLI for new workflows.
+Append through the compatibility projection only after the user authorizes the workbook destination:
+
+```bash
+paperreading export package.json literature.xlsx --format excel --sheet 中文
+```
+
+The legacy `scripts/append_paper_reading.py` entry point remains a compatibility wrapper for existing 13-field JSON. Prefer the CLI for new workflows.
+
+## Current implementation boundary
+
+- Core ingestion supports UTF-8 text and Markdown only.
+- PDF parsing and provider-driven automatic extraction are roadmap capabilities, not current Core behavior.
+- If the host can inspect another supplied format, record that review boundary honestly, but do not claim `paperreading verify` ran without a matching `PaperDocument`.
+- Batch processing, SQLite search, cross-paper synthesis, gap discovery, and method-specific auditing are not implemented.
 
 ## Mutation rules
 
-- Produce draft or validation output when no destination is explicitly provided.
-- Do not overwrite JSON or Markdown output unless the user requests replacement and `--force` is used.
-- For Excel, require an explicit path or the existing `PAPER_READING_WORKBOOK` configuration.
-- Treat `duplicate_skipped` as a successful no-op; report the existing worksheet row.
-- Treat schema mismatch, locked workbook, validation failure, or write error as a hard stop.
+- Produce draft, validation, or stdout output when no destination is explicitly provided.
+- Do not overwrite JSON or Markdown unless the user requests replacement and `--force` is used.
+- For Excel, require an explicit path or existing `PAPER_READING_WORKBOOK` configuration.
+- Treat `duplicate_skipped` as a successful no-op and report the existing worksheet row.
+- Treat schema mismatch, unresolved evidence, failed validation, locked workbook, or write error as a hard stop.
 - After a successful Excel append, report the worksheet, appended row, and timestamped backup path.
 
-If the `paperreading` command is unavailable, report that the Core package with the required exporter extra must be installed. Do not bypass the validator or reimplement workbook mutation ad hoc.
+If the `paperreading` command is unavailable, report that the Core package and any required exporter extra must be installed. Do not bypass the validator or reimplement workbook mutation ad hoc.

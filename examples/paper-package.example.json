@@ -1,0 +1,301 @@
+{
+  "schema_version": "0.3",
+  "state": "migrated",
+  "document": {
+    "source_id": "example-paper-v1",
+    "source_name": "示例论文：数字化转型与企业专业化分工",
+    "format": "legacy_record",
+    "media_type": "application/vnd.paperreading.v0.2+json",
+    "size_bytes": 0,
+    "page_count": 18,
+    "ingested_at": "2026-01-01T00:00:00Z"
+  },
+  "record": {
+    "schema_version": "0.3",
+    "paper_id": "example-digital-transformation-2024",
+    "record_type": "empirical",
+    "metadata": {
+      "title": "示例论文：数字化转型与企业专业化分工",
+      "authors": [
+        "作者甲",
+        "作者乙"
+      ],
+      "source_id": "example-paper-v1",
+      "journal": "示例期刊",
+      "publication_date": "2024",
+      "language": "zh-CN",
+      "keywords": [
+        "数字化转型",
+        "专业化分工",
+        "交易成本",
+        "企业边界"
+      ],
+      "rankings": []
+    },
+    "research_questions": [
+      "数字化转型与企业专业化分工之间存在何种关系？",
+      "外部交易成本是否构成这一关系的作用渠道？"
+    ],
+    "theoretical_framework": {
+      "framework": "交易成本理论",
+      "propositions": [
+        "数字技术可能改变企业内外部协调成本。"
+      ],
+      "causal_chain": "数字化转型 → 内外部协调成本变化 → 企业边界调整 → 专业化分工变化"
+    },
+    "data": {
+      "sample": "示例企业面板，仅用于演示结构",
+      "period": "2015—2023",
+      "sources": [
+        "合成企业数据库"
+      ],
+      "exclusions": []
+    },
+    "variables": [
+      {
+        "name": "专业化分工",
+        "role": "dependent",
+        "abbreviation": "SPEC",
+        "definition": "企业专业化程度",
+        "measurement": "示例指标"
+      },
+      {
+        "name": "数字化转型",
+        "role": "independent",
+        "abbreviation": "DIGI",
+        "definition": "企业数字化投入与应用",
+        "measurement": "示例文本指标"
+      },
+      {
+        "name": "外部交易成本",
+        "role": "mediator",
+        "abbreviation": "TC",
+        "definition": "企业外部协调成本",
+        "measurement": "示例代理变量"
+      },
+      {
+        "name": "企业规模",
+        "role": "control",
+        "abbreviation": "SIZE",
+        "measurement": "总资产对数"
+      }
+    ],
+    "empirical_design": {
+      "type": "panel_fe",
+      "method": "双向固定效应面板回归",
+      "fixed_effects": [
+        "企业",
+        "年份"
+      ],
+      "standard_errors": "企业层面聚类",
+      "identification_strategy": "利用企业内变化估计条件相关关系，不作强因果解释",
+      "endogeneity_methods": [],
+      "robustness_checks": [
+        "替换变量口径",
+        "缩尾处理"
+      ]
+    },
+    "source_claims": [
+      {
+        "claim_id": "claim-ca4f227b33b7bcd2",
+        "statement": "论文声称数字技术会改变企业边界。",
+        "evidence_ids": [
+          "ev-afea23a53d32bf68"
+        ]
+      }
+    ],
+    "findings": [
+      {
+        "finding_id": "finding-cc35193991f41d22",
+        "statement": "数字化转型与企业专业化分工呈显著正相关。",
+        "relationship": "positive",
+        "language_strength": "associational",
+        "significance": "示例结果",
+        "evidence_ids": [
+          "ev-35cfe279d89138f0"
+        ]
+      }
+    ],
+    "mechanisms": [
+      {
+        "mechanism_id": "mechanism-83a322d64827beb2",
+        "statement": "外部交易成本可能是相关关系的一个渠道。",
+        "variables": [
+          "TC"
+        ],
+        "evidence_ids": [
+          "ev-e956c5b7f60be8f8"
+        ]
+      }
+    ],
+    "heterogeneity": [],
+    "robustness": [
+      {
+        "test_id": "test-716abe77d10ec67e",
+        "name": "替换变量口径",
+        "result": "主要相关关系保持。",
+        "passed": true,
+        "evidence_ids": [
+          "ev-3d64be3a79d30f48"
+        ]
+      }
+    ],
+    "limitations": [
+      {
+        "limitation_id": "limitation-5d5ccbab14758ddf",
+        "statement": "示例设计不能排除全部未观测混杂。",
+        "origin": "legacy_unknown",
+        "evidence_ids": []
+      }
+    ],
+    "field_evidence": {}
+  },
+  "evidence_index": {
+    "ev-afea23a53d32bf68": {
+      "evidence_id": "ev-afea23a53d32bf68",
+      "source_id": "example-paper-v1",
+      "type": "TEXT",
+      "page": 2,
+      "section_path": [
+        "Introduction"
+      ],
+      "quoted_text": "示例性转述，不对应真实论文。",
+      "text_hash": "a19d2348f80fd067b46d38d7ba513dc0138ec8b28af3e4c9b9976721f9b58a14",
+      "traceability": {
+        "score": 0.85,
+        "level": "high",
+        "reasons": [
+          "source_id is present",
+          "page and section path are present",
+          "score measures traceability specificity only"
+        ],
+        "scoring_version": "1"
+      }
+    },
+    "ev-35cfe279d89138f0": {
+      "evidence_id": "ev-35cfe279d89138f0",
+      "source_id": "example-paper-v1",
+      "type": "TABLE",
+      "page": 12,
+      "section_path": [
+        "4.2 Baseline Results"
+      ],
+      "table": "Table 3",
+      "column": "(4)",
+      "traceability": {
+        "score": 0.95,
+        "level": "high",
+        "reasons": [
+          "source_id is present",
+          "page, table, and column are present",
+          "score measures traceability specificity only"
+        ],
+        "scoring_version": "1"
+      }
+    },
+    "ev-e956c5b7f60be8f8": {
+      "evidence_id": "ev-e956c5b7f60be8f8",
+      "source_id": "example-paper-v1",
+      "type": "TABLE",
+      "page": 15,
+      "section_path": [
+        "5.1 Mechanism"
+      ],
+      "table": "Table 5",
+      "column": "(2)",
+      "traceability": {
+        "score": 0.95,
+        "level": "high",
+        "reasons": [
+          "source_id is present",
+          "page, table, and column are present",
+          "score measures traceability specificity only"
+        ],
+        "scoring_version": "1"
+      }
+    },
+    "ev-3d64be3a79d30f48": {
+      "evidence_id": "ev-3d64be3a79d30f48",
+      "source_id": "example-paper-v1",
+      "type": "TABLE",
+      "page": 18,
+      "section_path": [
+        "6 Robustness"
+      ],
+      "table": "Table 7",
+      "column": "(3)",
+      "traceability": {
+        "score": 0.95,
+        "level": "high",
+        "reasons": [
+          "source_id is present",
+          "page, table, and column are present",
+          "score measures traceability specificity only"
+        ],
+        "scoring_version": "1"
+      }
+    }
+  },
+  "analysis": {
+    "assessments": [
+      {
+        "assessment_id": "assessment-2e890ccb1e1713af",
+        "type": "interpretation",
+        "statement": "现有设计支持条件相关结论，不能单凭固定效应回归强化为因果结论。",
+        "origin": "legacy_unknown",
+        "basis_evidence_ids": [],
+        "caveats": [
+          "Migrated from v0.2 without explicit evidence links."
+        ]
+      }
+    ],
+    "research_extensions": [
+      {
+        "extension_id": "extension-34f6c9fe876f109d",
+        "title": "识别强化",
+        "gap_type": "identification_gap",
+        "research_question": "外生数字基础设施冲击是否改变企业专业化分工？",
+        "supporting_evidence_ids": [],
+        "identification_strategy": "采用分期政策冲击并检验处理前趋势",
+        "data_sources": [
+          "企业面板",
+          "政策实施名单"
+        ],
+        "variables": [],
+        "robustness": [],
+        "falsification": "使用政策实施前的虚假处理时间",
+        "assumptions": [
+          "Migrated from v0.2; supporting evidence was not explicitly recorded."
+        ]
+      },
+      {
+        "extension_id": "extension-326c5780ed93c1d9",
+        "title": "机制拓展",
+        "gap_type": "mechanism_gap",
+        "research_question": "供应链协调成本是否解释企业边界调整？",
+        "supporting_evidence_ids": [],
+        "identification_strategy": "构造供应链暴露度并估计交互效应",
+        "data_sources": [
+          "供应链关系数据"
+        ],
+        "variables": [],
+        "mechanism_test": "检验协调成本代理变量的变化",
+        "robustness": [],
+        "assumptions": [
+          "Migrated from v0.2; supporting evidence was not explicitly recorded."
+        ]
+      }
+    ]
+  },
+  "run": {
+    "run_id": "run-d7cd0ea2d8129b07",
+    "pipeline_version": "0.3.0",
+    "provider": "migration",
+    "prompt_versions": {},
+    "created_at": "2026-01-01T00:00:00Z"
+  },
+  "migration_notes": [
+    "v0.2 extensions and researcher assessment were moved out of the source record.",
+    "Evidence was normalized by stable ID; source-content verification has not run."
+  ]
+}

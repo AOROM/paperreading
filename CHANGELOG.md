@@ -2,6 +2,32 @@
 
 All notable changes to PaperReading are documented in this file.
 
+## [0.3.0] - 2026-08-11
+
+### Added
+
+- Versioned `PaperDocument`, `PaperDraft`, and `PaperPackage` contracts.
+- A normalized evidence graph with stable `EvidenceSpan` identifiers and explicit verification states.
+- Deterministic UTF-8 text and Markdown ingestion with section, block, character-range, and text-hash metadata.
+- Source, page, block, section, quotation, and hash verification against supplied documents.
+- A typed project configuration and atomic file repository under `.paperreading/`.
+- `migrate`, `ingest`, and `verify` CLI commands and corresponding application use cases.
+- Immutable v0.2 and v0.3 schema directories plus deterministic v0.3 examples.
+
+### Changed
+
+- Separated source-grounded paper content from researcher or AI-assisted analysis.
+- Extended JSON, Markdown, validation, projection, and Excel paths to accept v0.3 packages.
+- Made artifact writes refuse implicit overwrite unless `--force` is supplied.
+- Updated the Codex Skill and bilingual documentation around the v0.3 evidence workflow.
+
+### Compatibility
+
+- v0.2 `PaperRecord` remains a supported public contract.
+- Deterministic v0.2 → v0.3 migration preserves the legacy 13-field projection.
+- Migrated evidence is explicitly marked unverified; migration does not claim source-content verification.
+- PDF parsing, provider-driven extraction, batch processing, SQLite search, synthesis, and gap discovery remain unimplemented roadmap items.
+
 ## [0.2.0] - 2026-08-11
 
 ### Added

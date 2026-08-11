@@ -2,78 +2,94 @@
 
 **English** | [简体中文](ROADMAP.zh-CN.md)
 
-The roadmap separates shipped behavior from research hypotheses. A milestone is complete only when its public contract, failure behavior, tests, and documentation are present.
+This roadmap separates shipped behavior from technical hypotheses. A capability is complete only when its public contract, migration or compatibility behavior, failure paths, tests, and documentation are present.
 
-## v0.2 — Core Refactor
+## Shipped foundations
+
+### v0.2 — Research Intelligence Core
+
+Status: implemented and retained as a compatibility contract.
+
+- Strict `PaperRecord` and `EvidenceRef` models.
+- Deterministic locator-specific confidence scoring.
+- Evidence and causal-language validation.
+- JSON, Markdown, legacy 13-field, and safe Excel outputs.
+- CLI, Python API, public schemas, synthetic examples, and CI gates.
+
+### v0.3 — Schema Separation & Migration
 
 Status: implemented in the repository.
 
-- Canonical Pydantic `PaperRecord` and `EvidenceRef` models.
-- Deterministic evidence-confidence scoring.
-- Evidence and causal-language validation.
-- Legacy 13-field projection.
-- JSON, Markdown, and safe Excel exporters.
-- `paperreading` CLI and importable Python API.
-- Public JSON Schemas and synthetic example record.
-- Codex Skill as an adapter to the Core.
-- Lint, type, schema, package, Skill, and compatibility gates in CI.
+- `PaperDocument`, `PaperDraft`, and `PaperPackage` public models.
+- Strict separation of source-grounded records and researcher analysis.
+- Stable, de-duplicated evidence graph using `EvidenceSpan` IDs.
+- Deterministic v0.2 → v0.3 migration with explicit provenance caveats.
+- Deterministic UTF-8 text and Markdown ingestion with block and section locators.
+- Source, page, block, section, quotation, and text-hash verification.
+- Inspectable atomic file repository under `.paperreading/`.
+- Versioned v0.2 and v0.3 JSON Schemas and deterministic examples.
+- v0.3 support in validation, CLI, JSON, Markdown, legacy projection, and Excel.
+- Regression proof that migrated packages preserve the v0.2 13-field projection.
 
-## v0.3 — Evidence Engine
+## Next: complete the Evidence Engine
 
-Status: planned.
+Status: planned; not implemented.
 
-- Section-aware PDF document model and optional parser dependency.
-- Multi-pass extraction protocol with explicit provider interface.
-- Claim-to-evidence graph and evidence deduplication.
-- Extraction-consistency and cross-check inputs for confidence scoring.
-- Expanded causal-language benchmark and unsupported-claim metric.
-- First small, redistributable golden dataset.
+Exit criteria:
+
+- Optional PDF parser behind a documented adapter boundary, with page geometry and table/figure limitations stated explicitly.
+- Multi-pass extraction protocol behind a provider interface; no provider dependency in the domain.
+- Candidate/conflict review flow from `PaperDraft` to finalized `PaperPackage`.
+- Evidence verification for PDF blocks, tables, figures, and equations with typed partial states.
+- Small redistributable golden dataset and published unsupported-claim, locator-resolution, and causal-language metrics.
+- Reproducible prompt/provider metadata without storing secrets or copyrighted sources.
 
 ## v0.4 — Batch Research Library
 
-Status: planned.
+Status: planned; not implemented.
 
-- Batch ingestion with resumable failures.
-- Local SQLite repository and versioned migrations.
-- Search and filter by method, variable, dataset, and tag.
-- Literature matrix, deterministic comparison, and record-level provenance.
-- Incremental project index under `.paperreading/`.
+- Resumable batch ingestion with item-level failure isolation.
+- SQLite repository behind the existing repository port and versioned migrations.
+- Search and filter by method, variable, dataset, evidence state, and tag.
+- Deterministic literature matrix and record-level comparison provenance.
+- Incremental project index and exportable run reports.
 
-## v0.5 — Research Intelligence
+## v0.5 — Evidence-Grounded Synthesis
 
-Status: planned.
+Status: planned; not implemented.
 
-- Consensus and conflict detection across records.
-- Synthesis statements bound to supporting and contradicting paper IDs.
+- Consensus and conflict detection across verified records.
+- Every synthesis statement bound to supporting and contradicting paper IDs.
 - Evidence-derived gap candidates using a published taxonomy.
-- Feasibility and novelty assessment with transparent components.
-- Executable research-design output derived from validated gaps.
+- Transparent feasibility, novelty, and evidence-coverage components.
+- Executable research designs derived from reviewed gaps, never presented as source findings.
 
 ## v0.6 — Empirical Method Auditors
 
-Status: planned.
+Status: planned; not implemented.
 
 - OLS and panel fixed-effects checks.
 - DID, staggered DID, and event-study checks.
 - IV and RDD checks.
-- PSM, placebo, and mediation interpretation checks.
-- Method-specific fixtures and false-positive tests.
+- PSM, placebo, and mechanism-interpretation checks.
+- Method-specific fixtures, abstention behavior, and false-positive tests.
 
 ## v1.0 — Stable Ecosystem
 
-Status: planned.
+Status: planned; not implemented.
 
-- Stable schema and migration policy.
+- Stable schema, deprecation, and migration policy.
 - PyPI release and signed release artifacts.
-- Provider and exporter plugin entry points.
+- Provider, parser, repository, and exporter plugin entry points.
 - MCP, Zotero, BibTeX, and additional agent adapters.
-- Public PaperReading-Bench methodology and baseline results.
+- Public PaperReading-Bench methodology and reproducible baselines.
 
-## Invariants across every version
+## Cross-version invariants
 
-1. Source claim, reported evidence, and researcher assessment remain distinct.
+1. Source claims, reported evidence, and researcher analysis remain distinct.
 2. Every derived cross-paper statement identifies its supporting records.
 3. Causal wording never becomes stronger than the identification evidence.
-4. The domain layer remains independent of interfaces, providers, and exporters.
-5. Legacy Excel compatibility remains covered by failure-path tests.
-6. Planned functionality is never documented as shipped functionality.
+4. Traceability and verification scores never masquerade as truth or study quality.
+5. The domain remains independent of interfaces, providers, storage, and exporters.
+6. Legacy Excel compatibility remains covered by success and failure-path tests.
+7. Planned functionality is never documented as shipped functionality.

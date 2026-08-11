@@ -1,0 +1,213 @@
+{
+  "$defs": {
+    "BlockKind": {
+      "enum": [
+        "heading",
+        "paragraph",
+        "table",
+        "other"
+      ],
+      "title": "BlockKind",
+      "type": "string"
+    },
+    "DocumentBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "block_id": {
+          "minLength": 1,
+          "title": "Block Id",
+          "type": "string"
+        },
+        "page": {
+          "minimum": 1,
+          "title": "Page",
+          "type": "integer"
+        },
+        "kind": {
+          "$ref": "#/$defs/BlockKind"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "char_start": {
+          "minimum": 0,
+          "title": "Char Start",
+          "type": "integer"
+        },
+        "char_end": {
+          "minimum": 1,
+          "title": "Char End",
+          "type": "integer"
+        },
+        "section_path": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Section Path",
+          "type": "array"
+        },
+        "text_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Text Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "block_id",
+        "page",
+        "kind",
+        "text",
+        "char_start",
+        "char_end",
+        "text_hash"
+      ],
+      "title": "DocumentBlock",
+      "type": "object"
+    },
+    "DocumentFormat": {
+      "enum": [
+        "text",
+        "markdown",
+        "pdf",
+        "legacy_record"
+      ],
+      "title": "DocumentFormat",
+      "type": "string"
+    },
+    "DocumentManifest": {
+      "additionalProperties": false,
+      "properties": {
+        "source_id": {
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "source_name": {
+          "minLength": 1,
+          "title": "Source Name",
+          "type": "string"
+        },
+        "format": {
+          "$ref": "#/$defs/DocumentFormat"
+        },
+        "media_type": {
+          "minLength": 1,
+          "title": "Media Type",
+          "type": "string"
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sha256"
+        },
+        "size_bytes": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Size Bytes",
+          "type": "integer"
+        },
+        "page_count": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Page Count",
+          "type": "integer"
+        },
+        "stored_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stored Path"
+        },
+        "ingested_at": {
+          "format": "date-time",
+          "title": "Ingested At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "source_name",
+        "format",
+        "media_type",
+        "ingested_at"
+      ],
+      "title": "DocumentManifest",
+      "type": "object"
+    },
+    "DocumentPage": {
+      "additionalProperties": false,
+      "properties": {
+        "page_number": {
+          "minimum": 1,
+          "title": "Page Number",
+          "type": "integer"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "blocks": {
+          "items": {
+            "$ref": "#/$defs/DocumentBlock"
+          },
+          "title": "Blocks",
+          "type": "array"
+        }
+      },
+      "required": [
+        "page_number",
+        "text"
+      ],
+      "title": "DocumentPage",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.3",
+      "default": "0.3",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "document_id": {
+      "minLength": 1,
+      "title": "Document Id",
+      "type": "string"
+    },
+    "manifest": {
+      "$ref": "#/$defs/DocumentManifest"
+    },
+    "pages": {
+      "items": {
+        "$ref": "#/$defs/DocumentPage"
+      },
+      "minItems": 1,
+      "title": "Pages",
+      "type": "array"
+    }
+  },
+  "required": [
+    "document_id",
+    "manifest",
+    "pages"
+  ],
+  "title": "PaperDocument",
+  "type": "object"
+}

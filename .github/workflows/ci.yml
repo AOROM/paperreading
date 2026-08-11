@@ -52,6 +52,9 @@ jobs:
       - name: Validate public schemas
         run: python tools/export_schemas.py --check
 
+      - name: Validate deterministic examples
+        run: python tools/generate_examples.py --check
+
       - name: Compile Python sources
         run: python -m compileall -q src skills tools tests
 

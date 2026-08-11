@@ -18,28 +18,31 @@
 允许的依赖方向为：
 
 ```text
-domain <- validation / projections <- application interfaces / exporters
+domain <- migrations / ingestion / verification / validation / projections
+       <- application use cases <- CLI / Skill / exporters / repositories
 ```
 
 - `src/paperreading/domain/` 不得导入 Typer、OpenPyXL、AI SDK、Codex、Storage 或 Exporter。
 - 工作簿专属逻辑只能放在 `src/paperreading/exporters/excel.py`。
-- CLI 行为只能放在 `src/paperreading/cli.py`；可复用行为必须进入接口层之下。
-- 将 `PaperRecord` 视为唯一核心模型，不得通过直接增加 Excel 列来修改 Domain 契约。
+- CLI 行为只能放在 `src/paperreading/cli.py`；可复用编排进入 `application/`，可替换持久化必须位于 `repositories/base.py` 之后。
+- 将 v0.3 `PaperPackage` 视为当前研究资产，并将 v0.2 `PaperRecord` 继续作为受支持的兼容契约。
+- 来源派生字段只进入 `GroundedPaperRecord`；研究者或 AI 辅助解释必须进入 `ResearchAnalysis`。
 - 旧版工作簿变更必须通过 `to_legacy_13_fields` 实现，并保留兼容性测试。
 - 保持 Codex 运行时 Skill 简洁。详细契约放入 references，确定性行为放入 Core。
 - 不为路线图功能创建没有实现的空模块。
 
 ## Schema 变更
 
-修改 `PaperRecord` 或 `EvidenceRef` 时：
+修改公开 Domain 模型或证据契约时：
 
-1. 评估变更是否向后兼容。
-2. 新增或更新模型测试与失败路径测试。
-3. 运行 `python tools/export_schemas.py` 重新生成 Schema。
-4. 更新合成示例和相关文档。
-5. 在 `CHANGELOG.md` 中记录行为，并在 Pull Request 中说明迁移影响。
+1. 判断变更在当前 Schema 版本内是否向后兼容。
+2. 如果不兼容，引入新版本和显式确定性迁移，绝不静默重新解释旧 JSON。
+3. 按适用范围增加模型、未解析引用、迁移、往返与失败路径测试。
+4. 运行 `python tools/export_schemas.py` 重新生成 Schema，并运行 `python tools/generate_examples.py` 重新生成示例。
+5. 保持 `schemas/v0.2/` 或 `schemas/v0.3/` 中的不可变契约；根目录 Schema 文件是已记录的别名。
+6. 同步更新两种语言文档，并在 `CHANGELOG.md` 和 Pull Request 中说明迁移影响。
 
-置信度评分规则必须保持确定性和可解释性。调用方提供的置信度不得绕过仓库规则。
+可追溯性与置信度规则必须保持确定性和可解释性。调用方提供的值不得绕过仓库规则。这些分数不得被描述为真实性、研究质量、因果有效性或外部效度。
 
 ## 变更范围与数据安全
 
@@ -65,12 +68,13 @@ python -m ruff check .
 python -m ruff format --check .
 python -m mypy
 python tools/export_schemas.py --check
+python tools/generate_examples.py --check
 python tools/validate_skill.py skills/papers-reading-skill
 python -m unittest discover -s tests -v
 python -m pip wheel --no-deps --wheel-dir dist .
 ```
 
-工作簿变更必须覆盖正常追加、重复跳过、Schema 不匹配且源文件不变、备份创建，以及通过显式路径或配置解析目标。Core 变更应根据适用范围覆盖 Schema 拒绝、证据来源、因果语言边界、投影兼容与 Exporter 失败行为。
+工作簿变更必须覆盖正常追加、重复跳过、Schema 不匹配且源文件不变、备份创建，以及通过显式路径或配置解析目标。Core 变更应根据适用范围覆盖 Schema 拒绝、未解析证据 ID、来源正文核验状态、因果语言边界、版本迁移、投影兼容与 Exporter 失败行为。
 
 ## Pull Request
 

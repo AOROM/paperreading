@@ -1,0 +1,1721 @@
+{
+  "$defs": {
+    "AnalyzedResearchExtension": {
+      "additionalProperties": false,
+      "properties": {
+        "extension_id": {
+          "minLength": 1,
+          "title": "Extension Id",
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "gap_type": {
+          "$ref": "#/$defs/GapType"
+        },
+        "research_question": {
+          "minLength": 1,
+          "title": "Research Question",
+          "type": "string"
+        },
+        "supporting_evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Supporting Evidence Ids",
+          "type": "array"
+        },
+        "identification_strategy": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Identification Strategy"
+        },
+        "sample": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sample"
+        },
+        "data_sources": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Data Sources",
+          "type": "array"
+        },
+        "variables": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Variables",
+          "type": "array"
+        },
+        "mechanism_test": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mechanism Test"
+        },
+        "robustness": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Robustness",
+          "type": "array"
+        },
+        "falsification": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Falsification"
+        },
+        "expected_contribution": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Contribution"
+        },
+        "assumptions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Assumptions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "extension_id",
+        "title",
+        "gap_type",
+        "research_question"
+      ],
+      "title": "AnalyzedResearchExtension",
+      "type": "object"
+    },
+    "AssessmentOrigin": {
+      "enum": [
+        "researcher",
+        "ai_assisted",
+        "legacy_unknown"
+      ],
+      "title": "AssessmentOrigin",
+      "type": "string"
+    },
+    "AssessmentType": {
+      "enum": [
+        "interpretation",
+        "limitation",
+        "caveat"
+      ],
+      "title": "AssessmentType",
+      "type": "string"
+    },
+    "AuditCheck": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "minLength": 1,
+          "title": "Code",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/AuditStatus"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "severity": {
+          "default": "info",
+          "title": "Severity",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "status",
+        "message"
+      ],
+      "title": "AuditCheck",
+      "type": "object"
+    },
+    "AuditStatus": {
+      "enum": [
+        "pass",
+        "fail",
+        "unclear",
+        "not_applicable"
+      ],
+      "title": "AuditStatus",
+      "type": "string"
+    },
+    "CausalSupport": {
+      "enum": [
+        "unsupported",
+        "limited",
+        "supported_with_caveats",
+        "supported"
+      ],
+      "title": "CausalSupport",
+      "type": "string"
+    },
+    "ConfidenceLevel": {
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ],
+      "title": "ConfidenceLevel",
+      "type": "string"
+    },
+    "DataDescription": {
+      "additionalProperties": false,
+      "properties": {
+        "sample": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sample"
+        },
+        "period": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Period"
+        },
+        "sources": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Sources",
+          "type": "array"
+        },
+        "exclusions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Exclusions",
+          "type": "array"
+        }
+      },
+      "title": "DataDescription",
+      "type": "object"
+    },
+    "DesignType": {
+      "enum": [
+        "ols",
+        "panel_fe",
+        "did",
+        "staggered_did",
+        "iv",
+        "rdd",
+        "psm",
+        "event_study",
+        "rct",
+        "qualitative",
+        "other"
+      ],
+      "title": "DesignType",
+      "type": "string"
+    },
+    "DocumentFormat": {
+      "enum": [
+        "text",
+        "markdown",
+        "pdf",
+        "legacy_record"
+      ],
+      "title": "DocumentFormat",
+      "type": "string"
+    },
+    "DocumentManifest": {
+      "additionalProperties": false,
+      "properties": {
+        "source_id": {
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "source_name": {
+          "minLength": 1,
+          "title": "Source Name",
+          "type": "string"
+        },
+        "format": {
+          "$ref": "#/$defs/DocumentFormat"
+        },
+        "media_type": {
+          "minLength": 1,
+          "title": "Media Type",
+          "type": "string"
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sha256"
+        },
+        "size_bytes": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Size Bytes",
+          "type": "integer"
+        },
+        "page_count": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Page Count",
+          "type": "integer"
+        },
+        "stored_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stored Path"
+        },
+        "ingested_at": {
+          "format": "date-time",
+          "title": "Ingested At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "source_name",
+        "format",
+        "media_type",
+        "ingested_at"
+      ],
+      "title": "DocumentManifest",
+      "type": "object"
+    },
+    "EmpiricalDesign": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/DesignType"
+        },
+        "method": {
+          "minLength": 1,
+          "title": "Method",
+          "type": "string"
+        },
+        "model_equation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Equation"
+        },
+        "fixed_effects": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Fixed Effects",
+          "type": "array"
+        },
+        "standard_errors": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Standard Errors"
+        },
+        "identification_strategy": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Identification Strategy"
+        },
+        "endogeneity_methods": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Endogeneity Methods",
+          "type": "array"
+        },
+        "robustness_checks": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Robustness Checks",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "method"
+      ],
+      "title": "EmpiricalDesign",
+      "type": "object"
+    },
+    "EvidenceSpan": {
+      "additionalProperties": false,
+      "description": "Normalized evidence node referenced by ID from v0.3 research objects.",
+      "properties": {
+        "evidence_id": {
+          "minLength": 1,
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "source_id": {
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/EvidenceType"
+        },
+        "page": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page"
+        },
+        "section_path": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Section Path",
+          "type": "array"
+        },
+        "block_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Block Id"
+        },
+        "char_start": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Char Start"
+        },
+        "char_end": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Char End"
+        },
+        "bbox": {
+          "anyOf": [
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Bbox"
+        },
+        "table": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Table"
+        },
+        "column": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Column"
+        },
+        "figure": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Figure"
+        },
+        "equation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Equation"
+        },
+        "appendix": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Appendix"
+        },
+        "quoted_text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quoted Text"
+        },
+        "text_hash": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Text Hash"
+        },
+        "traceability": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TraceabilityScore"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "verification": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceVerification"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "evidence_id",
+        "source_id",
+        "type"
+      ],
+      "title": "EvidenceSpan",
+      "type": "object"
+    },
+    "EvidenceType": {
+      "description": "Supported source surfaces for a research statement.",
+      "enum": [
+        "TEXT",
+        "TABLE",
+        "FIGURE",
+        "EQUATION",
+        "APPENDIX",
+        "METADATA"
+      ],
+      "title": "EvidenceType",
+      "type": "string"
+    },
+    "EvidenceVerification": {
+      "additionalProperties": false,
+      "description": "Result of checking an EvidenceSpan against a supplied PaperDocument.",
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/VerificationStatus"
+        },
+        "source_match": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Match"
+        },
+        "page_resolved": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page Resolved"
+        },
+        "block_resolved": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Block Resolved"
+        },
+        "char_range_resolved": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Char Range Resolved"
+        },
+        "quote_match": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quote Match"
+        },
+        "text_hash_match": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Text Hash Match"
+        },
+        "issues": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Issues",
+          "type": "array"
+        },
+        "verifier_version": {
+          "default": "0.3.0",
+          "title": "Verifier Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "EvidenceVerification",
+      "type": "object"
+    },
+    "GapType": {
+      "enum": [
+        "method_gap",
+        "data_gap",
+        "variable_gap",
+        "mechanism_gap",
+        "context_gap",
+        "identification_gap",
+        "external_validity_gap",
+        "temporal_gap",
+        "measurement_gap",
+        "theory_gap",
+        "contradictory_evidence"
+      ],
+      "title": "GapType",
+      "type": "string"
+    },
+    "GroundedFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "finding_id": {
+          "minLength": 1,
+          "title": "Finding Id",
+          "type": "string"
+        },
+        "statement": {
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        },
+        "relationship": {
+          "$ref": "#/$defs/Relationship"
+        },
+        "language_strength": {
+          "$ref": "#/$defs/LanguageStrength",
+          "default": "associational"
+        },
+        "coefficient": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Coefficient"
+        },
+        "significance": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Significance"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "finding_id",
+        "statement",
+        "relationship",
+        "evidence_ids"
+      ],
+      "title": "GroundedFinding",
+      "type": "object"
+    },
+    "GroundedLimitation": {
+      "additionalProperties": false,
+      "properties": {
+        "limitation_id": {
+          "minLength": 1,
+          "title": "Limitation Id",
+          "type": "string"
+        },
+        "statement": {
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        },
+        "origin": {
+          "$ref": "#/$defs/LimitationOrigin"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "limitation_id",
+        "statement",
+        "origin"
+      ],
+      "title": "GroundedLimitation",
+      "type": "object"
+    },
+    "GroundedMechanism": {
+      "additionalProperties": false,
+      "properties": {
+        "mechanism_id": {
+          "minLength": 1,
+          "title": "Mechanism Id",
+          "type": "string"
+        },
+        "statement": {
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        },
+        "variables": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Variables",
+          "type": "array"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "mechanism_id",
+        "statement",
+        "evidence_ids"
+      ],
+      "title": "GroundedMechanism",
+      "type": "object"
+    },
+    "GroundedPaperRecord": {
+      "additionalProperties": false,
+      "description": "Source-derived facts only; analysis and suggestions live outside this model.",
+      "properties": {
+        "schema_version": {
+          "const": "0.3",
+          "default": "0.3",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "paper_id": {
+          "minLength": 1,
+          "title": "Paper Id",
+          "type": "string"
+        },
+        "record_type": {
+          "$ref": "#/$defs/RecordType",
+          "default": "empirical"
+        },
+        "metadata": {
+          "$ref": "#/$defs/PaperMetadata"
+        },
+        "research_questions": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 3,
+          "minItems": 1,
+          "title": "Research Questions",
+          "type": "array"
+        },
+        "theoretical_framework": {
+          "$ref": "#/$defs/Theory"
+        },
+        "data": {
+          "$ref": "#/$defs/DataDescription"
+        },
+        "variables": {
+          "items": {
+            "$ref": "#/$defs/Variable"
+          },
+          "title": "Variables",
+          "type": "array"
+        },
+        "empirical_design": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EmpiricalDesign"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "source_claims": {
+          "items": {
+            "$ref": "#/$defs/GroundedSourceClaim"
+          },
+          "minItems": 1,
+          "title": "Source Claims",
+          "type": "array"
+        },
+        "findings": {
+          "items": {
+            "$ref": "#/$defs/GroundedFinding"
+          },
+          "title": "Findings",
+          "type": "array"
+        },
+        "mechanisms": {
+          "items": {
+            "$ref": "#/$defs/GroundedMechanism"
+          },
+          "title": "Mechanisms",
+          "type": "array"
+        },
+        "heterogeneity": {
+          "items": {
+            "$ref": "#/$defs/GroundedFinding"
+          },
+          "title": "Heterogeneity",
+          "type": "array"
+        },
+        "robustness": {
+          "items": {
+            "$ref": "#/$defs/GroundedTestResult"
+          },
+          "title": "Robustness",
+          "type": "array"
+        },
+        "limitations": {
+          "items": {
+            "$ref": "#/$defs/GroundedLimitation"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "field_evidence": {
+          "additionalProperties": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": "Field Evidence",
+          "type": "object"
+        }
+      },
+      "required": [
+        "paper_id",
+        "metadata",
+        "research_questions",
+        "theoretical_framework",
+        "data",
+        "source_claims"
+      ],
+      "title": "GroundedPaperRecord",
+      "type": "object"
+    },
+    "GroundedSourceClaim": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "minLength": 1,
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "statement": {
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "claim_id",
+        "statement",
+        "evidence_ids"
+      ],
+      "title": "GroundedSourceClaim",
+      "type": "object"
+    },
+    "GroundedTestResult": {
+      "additionalProperties": false,
+      "properties": {
+        "test_id": {
+          "minLength": 1,
+          "title": "Test Id",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "result": {
+          "minLength": 1,
+          "title": "Result",
+          "type": "string"
+        },
+        "passed": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Passed"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "test_id",
+        "name",
+        "result",
+        "evidence_ids"
+      ],
+      "title": "GroundedTestResult",
+      "type": "object"
+    },
+    "LanguageStrength": {
+      "enum": [
+        "descriptive",
+        "associational",
+        "causal"
+      ],
+      "title": "LanguageStrength",
+      "type": "string"
+    },
+    "LimitationOrigin": {
+      "enum": [
+        "paper",
+        "legacy_unknown"
+      ],
+      "title": "LimitationOrigin",
+      "type": "string"
+    },
+    "MethodAuditReport": {
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "minLength": 1,
+          "title": "Method",
+          "type": "string"
+        },
+        "causal_support": {
+          "$ref": "#/$defs/CausalSupport"
+        },
+        "checks": {
+          "items": {
+            "$ref": "#/$defs/AuditCheck"
+          },
+          "title": "Checks",
+          "type": "array"
+        },
+        "auditor_version": {
+          "default": "0.3.0",
+          "title": "Auditor Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "method",
+        "causal_support"
+      ],
+      "title": "MethodAuditReport",
+      "type": "object"
+    },
+    "PackageState": {
+      "enum": [
+        "migrated",
+        "finalized",
+        "verified",
+        "audited"
+      ],
+      "title": "PackageState",
+      "type": "string"
+    },
+    "PaperMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "authors": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Authors",
+          "type": "array"
+        },
+        "source_id": {
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "journal": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Journal"
+        },
+        "publication_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Publication Date"
+        },
+        "doi": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doi"
+        },
+        "language": {
+          "default": "zh-CN",
+          "title": "Language",
+          "type": "string"
+        },
+        "keywords": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Keywords",
+          "type": "array"
+        },
+        "rankings": {
+          "items": {
+            "$ref": "#/$defs/RankingEvidence"
+          },
+          "title": "Rankings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "title",
+        "authors",
+        "source_id"
+      ],
+      "title": "PaperMetadata",
+      "type": "object"
+    },
+    "RankingEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "system": {
+          "minLength": 1,
+          "title": "System",
+          "type": "string"
+        },
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Version"
+        },
+        "effective_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Effective Date"
+        },
+        "verified_on": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Verified On"
+        }
+      },
+      "required": [
+        "system",
+        "label",
+        "source"
+      ],
+      "title": "RankingEvidence",
+      "type": "object"
+    },
+    "RecordType": {
+      "enum": [
+        "empirical",
+        "theoretical",
+        "review",
+        "other"
+      ],
+      "title": "RecordType",
+      "type": "string"
+    },
+    "Relationship": {
+      "enum": [
+        "positive",
+        "negative",
+        "null",
+        "mixed",
+        "unknown"
+      ],
+      "title": "Relationship",
+      "type": "string"
+    },
+    "ResearchAnalysis": {
+      "additionalProperties": false,
+      "properties": {
+        "assessments": {
+          "items": {
+            "$ref": "#/$defs/ResearchAssessment"
+          },
+          "title": "Assessments",
+          "type": "array"
+        },
+        "research_extensions": {
+          "items": {
+            "$ref": "#/$defs/AnalyzedResearchExtension"
+          },
+          "title": "Research Extensions",
+          "type": "array"
+        }
+      },
+      "title": "ResearchAnalysis",
+      "type": "object"
+    },
+    "ResearchAssessment": {
+      "additionalProperties": false,
+      "properties": {
+        "assessment_id": {
+          "minLength": 1,
+          "title": "Assessment Id",
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/AssessmentType"
+        },
+        "statement": {
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        },
+        "origin": {
+          "$ref": "#/$defs/AssessmentOrigin"
+        },
+        "basis_evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Basis Evidence Ids",
+          "type": "array"
+        },
+        "caveats": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Caveats",
+          "type": "array"
+        }
+      },
+      "required": [
+        "assessment_id",
+        "type",
+        "statement",
+        "origin"
+      ],
+      "title": "ResearchAssessment",
+      "type": "object"
+    },
+    "RunManifest": {
+      "additionalProperties": false,
+      "properties": {
+        "run_id": {
+          "minLength": 1,
+          "title": "Run Id",
+          "type": "string"
+        },
+        "pipeline_version": {
+          "default": "0.3.0",
+          "title": "Pipeline Version",
+          "type": "string"
+        },
+        "source_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Sha256"
+        },
+        "config_hash": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Config Hash"
+        },
+        "provider": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provider"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model"
+        },
+        "prompt_versions": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Prompt Versions",
+          "type": "object"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "created_at"
+      ],
+      "title": "RunManifest",
+      "type": "object"
+    },
+    "Theory": {
+      "additionalProperties": false,
+      "properties": {
+        "framework": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Framework"
+        },
+        "propositions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Propositions",
+          "type": "array"
+        },
+        "causal_chain": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Causal Chain"
+        }
+      },
+      "title": "Theory",
+      "type": "object"
+    },
+    "TraceabilityScore": {
+      "additionalProperties": false,
+      "description": "Locator-specificity score; it is not a truth or study-quality score.",
+      "properties": {
+        "score": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Score",
+          "type": "number"
+        },
+        "level": {
+          "$ref": "#/$defs/ConfidenceLevel"
+        },
+        "reasons": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Reasons",
+          "type": "array"
+        },
+        "scoring_version": {
+          "const": "1",
+          "default": "1",
+          "title": "Scoring Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "score",
+        "level",
+        "reasons"
+      ],
+      "title": "TraceabilityScore",
+      "type": "object"
+    },
+    "Variable": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "role": {
+          "$ref": "#/$defs/VariableRole"
+        },
+        "abbreviation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Abbreviation"
+        },
+        "definition": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Definition"
+        },
+        "measurement": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Measurement"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source"
+        }
+      },
+      "required": [
+        "name",
+        "role"
+      ],
+      "title": "Variable",
+      "type": "object"
+    },
+    "VariableRole": {
+      "enum": [
+        "dependent",
+        "independent",
+        "control",
+        "mediator",
+        "moderator",
+        "instrument"
+      ],
+      "title": "VariableRole",
+      "type": "string"
+    },
+    "VerificationStatus": {
+      "enum": [
+        "verified",
+        "partial",
+        "failed",
+        "not_run"
+      ],
+      "title": "VerificationStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Canonical v0.3 research asset with normalized evidence references.",
+  "properties": {
+    "schema_version": {
+      "const": "0.3",
+      "default": "0.3",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "state": {
+      "$ref": "#/$defs/PackageState"
+    },
+    "document": {
+      "$ref": "#/$defs/DocumentManifest"
+    },
+    "record": {
+      "$ref": "#/$defs/GroundedPaperRecord"
+    },
+    "evidence_index": {
+      "additionalProperties": {
+        "$ref": "#/$defs/EvidenceSpan"
+      },
+      "minProperties": 1,
+      "title": "Evidence Index",
+      "type": "object"
+    },
+    "analysis": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ResearchAnalysis"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "audit": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MethodAuditReport"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "run": {
+      "$ref": "#/$defs/RunManifest"
+    },
+    "migration_notes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Migration Notes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "state",
+    "document",
+    "record",
+    "evidence_index",
+    "run"
+  ],
+  "title": "PaperPackage",
+  "type": "object"
+}

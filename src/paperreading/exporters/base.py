@@ -6,7 +6,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Protocol
 
-from paperreading.domain import PaperRecord
+from paperreading.artifacts import ResearchArtifact
 
 
 class ExportFormat(str, Enum):
@@ -22,7 +22,7 @@ class ExportResult(dict[str, object]):
 class Exporter(Protocol):
     def export(
         self,
-        records: list[PaperRecord],
+        records: list[ResearchArtifact],
         destination: Path,
         **options: object,
     ) -> ExportResult: ...

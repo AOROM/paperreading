@@ -1,4 +1,4 @@
 interface:
-  display_name: "PaperReading Research Intelligence"
-  short_description: "Build traceable paper records and validated research exports."
-  default_prompt: "Use $papers-reading-skill to turn this supplied paper into a validated PaperRecord with claim-to-evidence links, then produce a Markdown draft without modifying my workbook."
+  display_name: "PaperReading Evidence Workflow"
+  short_description: "Build source-grounded paper packages and research exports."
+  default_prompt: "Use $papers-reading-skill to turn this supplied paper into a validated v0.3 PaperPackage with evidence IDs, keep source findings separate from analysis, and produce a reviewable Markdown export without modifying my workbook."
