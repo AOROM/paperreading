@@ -1,22 +1,31 @@
 ---
 name: papers-reading-skill
-description: Read finance, economics, management, and social-science papers into 13 evidence-grounded literature-review fields, propose executable follow-up research designs, and optionally append a validated row to an Excel review workbook without damaging existing content. Use when Codex needs to extract bibliographic metadata, journal ranking, research questions, findings, causal logic, empirical models, data, variables, mechanisms, robustness checks, extensions, or update a paper-reading workbook.
+description: Evidence-grounded AI research workflow for turning finance, economics, management, and social-science papers into 13 traceable literature-review fields, separating source claims, reported evidence, and researcher assessment, proposing executable follow-up designs, and optionally appending validated rows to Excel without damaging existing content. Use when Codex needs to read or review a paper, extract bibliographic metadata, journal ranking, research questions, findings, causal logic, empirical models, data, variables, mechanisms, robustness checks, research extensions, or update a paper-reading workbook.
 ---
 
-# Papers Reading Skill
+# Evidence-Grounded Paper Reading
 
 ## Core workflow
 
-1. Identify the title, authors, journal, publication date, and keywords.
+1. Establish the supplied source boundary and identify available title, author, journal, publication date, keyword, page, and section metadata.
 2. Read the abstract and introduction, then theory or hypotheses, research design, data and variables, baseline results, mechanism and heterogeneity tests, robustness or endogeneity checks, and conclusion.
-3. Separate the paper's stated claims, reported evidence, and your assessment. Never fill a gap with an invented model, variable, test, source, or ranking.
+3. Separate the paper's stated claims, reported evidence, and your assessment. Preserve missing or unconfirmed information as unknown instead of filling a gap with an invented model, variable, test, source, ranking, page number, or quotation.
 4. Build the 13 fields in the exact order defined in `references/reading-fields.md`.
-5. Check completeness and causal-language discipline before offering to write the row.
+5. Check completeness, evidence boundaries, and causal-language discipline before offering to write the row.
 6. Append only after the fields are validated and a workbook path is available. Produce draft-only output when the user requests it.
 
 ## Required references
 
 - Read `references/reading-fields.md` before producing structured fields or writing a workbook row.
+
+## Evidence-grounding contract
+
+- Label a statement as a source claim only when the paper explicitly states it.
+- Label a result as reported evidence only when it is supported by the supplied text, table, figure, model, or test.
+- Keep researcher assessment visibly separate from source claims and reported evidence.
+- Preserve explicit null results, caveats, sample limits, and identification limits.
+- When page or section locations are available, retain them in review notes or provide them when requested without changing the 13-column workbook contract.
+- Never fabricate a source location. If provenance cannot be established from the supplied material, omit the locator and state the boundary outside fields that prohibit missing-status placeholders.
 
 ## Evidence rules
 

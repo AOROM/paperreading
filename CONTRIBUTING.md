@@ -4,6 +4,16 @@
 
 Thank you for improving Paper Reading Skill. Follow these conventions before submitting a change.
 
+## Project contract
+
+Every contribution must preserve the project's position as an evidence-grounded AI research workflow:
+
+- Keep source claims, reported evidence, and researcher assessment distinguishable.
+- Preserve uncertainty and explicit null results; never fill missing information with invented content.
+- Require identification evidence before strengthening associative language into causal language.
+- Keep workbook mutations validated, reversible, and explicitly authorized by the user.
+- Add failure-path tests when changing deterministic validation or write behavior.
+
 ## Scope of changes
 
 - Keep the instructions, scripts, and references required by Codex at runtime in `skills/papers-reading-skill/`.
@@ -35,3 +45,4 @@ State clearly:
 2. Whether any behavior or field contract changes;
 3. The validation commands you ran and their results;
 4. The source and version of any external material involved.
+5. How the change preserves evidence grounding and safe output behavior.

@@ -1,4 +1,4 @@
 interface:
-  display_name: "Papers Reading"
-  short_description: "Structure papers into 13 fields and write Excel safely."
-  default_prompt: "Use $papers-reading-skill to read this paper into 13 evidence-grounded fields and append the validated row to my configured workbook."
+  display_name: "Evidence-Grounded Paper Reading"
+  short_description: "Turn papers into traceable evidence and safe Excel rows."
+  default_prompt: "Use $papers-reading-skill to turn this paper into 13 evidence-grounded fields, separate source claims from reported evidence and assessment, and append the validated row to my configured workbook."
