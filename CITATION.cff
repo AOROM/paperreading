@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use PaperReading in your research workflow, please cite this software."
+title: "PaperReading: Evidence-grounded AI paper reading for empirical research"
+type: software
+authors:
+  - name: AOROM
+repository-code: "https://github.com/AOROM/paperreading"
+license: MIT
+version: "0.2.0-dev"
+date-released: "2026-08-11"
+keywords:
+  - literature review
+  - paper reading
+  - empirical research
+  - evidence grounding
+  - finance
+  - economics
+  - management

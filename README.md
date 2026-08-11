@@ -1,106 +1,151 @@
-# Paper Reading Skill
+# PaperReading
 
 **English** | [简体中文](README.zh-CN.md)
 
 [![CI](https://github.com/AOROM/paperreading/actions/workflows/ci.yml/badge.svg)](https://github.com/AOROM/paperreading/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-An installable Codex skill for reading finance, economics, management, and social-science papers. It converts each paper into 13 auditable fields, separates the paper's claims, empirical evidence, and the reviewer's assessment, proposes executable follow-up research designs, and can safely append the results to an existing Excel literature-review workbook.
+> **Turn papers into research intelligence.**
 
-## Core capabilities
+PaperReading is an evidence-grounded AI research workflow for **finance, economics, management, accounting, and empirical social science**. Instead of stopping at a generic summary, it structures papers around research questions, theory, identification, variables, evidence, mechanisms, robustness, limitations, and executable follow-up designs.
 
-- Extract the title, authors, journal, ranking, publication date, keywords, research questions, findings, research logic, empirical models, data and variables, and extension designs in a fixed order.
-- Organize baseline results, mechanisms, heterogeneity, economic consequences, endogeneity treatment, and robustness checks into distinct layers.
-- Avoid presenting correlation as causation or inventing missing variables, models, data sources, or journal rankings.
-- Safely add the thirteenth field to a compatible 12-column workbook while preserving existing content, styles, formulas, filters, and table structure.
-- Detect duplicates before writing, validate a temporary save, create a backup, and atomically replace the original workbook.
+The repository keeps the existing installable Codex skill and safe Excel workflow, while evolving toward a reusable Python core for auditable paper records, evidence maps, cross-paper comparison, and literature synthesis.
+
+## Why PaperReading?
+
+Most paper-reading tools optimize for *what a paper says*. PaperReading is designed around *why a result should be believed and how it can be extended*.
+
+```text
+Paper / PDF
+    │
+    ├── Structured Reading ── 13-field review schema
+    ├── Evidence Map ──────── page / section / table / figure anchors
+    ├── Method Audit ──────── identification / endogeneity / robustness
+    ├── Literature Matrix ─── cross-paper comparison
+    └── Research Extensions ─ executable follow-up designs
+                │
+                └── Excel / JSON / Markdown / future integrations
+```
+
+## Current capabilities
+
+### 1. Evidence-grounded 13-field reading
+
+The existing Codex skill extracts bibliographic metadata, research questions, findings, research logic, empirical models, data and variables, and follow-up research designs in a fixed auditable structure.
+
+It explicitly separates baseline findings, mechanisms, heterogeneity, economic consequences, endogeneity treatment, and robustness checks, and avoids inventing missing variables, models, rankings, or causal claims.
+
+### 2. Auditable paper records
+
+The new `paperreading` Python package provides a reusable data model for paper metadata, empirical design, findings, and evidence anchors.
+
+```python
+from paperreading import EvidenceRef, Finding, PaperRecord
+
+paper = PaperRecord(
+    title="Example paper",
+    research_questions=["Does X affect Y?"],
+    findings=[
+        Finding(
+            text="X is positively associated with Y.",
+            category="baseline",
+            evidence=[EvidenceRef(page=12, table="Table 3", section="4.2")],
+        )
+    ],
+)
+```
+
+### 3. Literature Matrix
+
+Multiple `PaperRecord` objects can be converted into a compact comparison matrix without requiring pandas:
+
+```python
+from paperreading import build_literature_matrix, matrix_to_markdown
+
+rows = build_literature_matrix([paper_a, paper_b])
+print(matrix_to_markdown(rows))
+```
+
+The matrix exposes title, journal, research question, identification strategy, key X/Y variables, mechanisms, main finding, and evidence coverage.
+
+### 4. Safe Excel literature-review workflow
+
+The existing deterministic writer can append validated 13-field results to an existing workbook while preserving values, formulas, formatting, filters, tables, and workbook structure. It detects duplicates, validates a temporary save, creates a backup, and atomically replaces the source file.
 
 ## Project structure
 
 ```text
 paperreading/
-├── skills/papers-reading-skill/   # Installable skill
-│   ├── SKILL.md
-│   ├── agents/openai.yaml
-│   ├── references/
-│   └── scripts/append_paper_reading.py
-├── examples/                      # Example input
-├── tests/                         # End-to-end and structural tests
-├── tools/                         # Repository-level validation tools
-└── .github/workflows/ci.yml       # Automated validation
+├── paperreading/                   # Reusable research-intelligence core
+│   ├── models.py                   # Paper, method, finding, evidence models
+│   ├── evidence.py                 # Evidence labels and coverage metrics
+│   └── matrix.py                   # Cross-paper literature matrix
+├── schemas/paper.schema.json       # Portable paper-record contract
+├── skills/papers-reading-skill/    # Installable Codex skill
+├── examples/                       # Structured examples
+├── docs/                           # Architecture and methodology
+├── tests/                          # Core + workbook tests
+├── ROADMAP.md
+├── CHANGELOG.md
+└── CITATION.cff
 ```
 
-Repository-level documentation, tests, and CI configuration are not loaded into the skill's runtime context. Install only `skills/papers-reading-skill/`.
+## Quick start
 
-## Installation
-
-1. Clone the repository and install the script dependencies:
-
-   ```bash
-   git clone https://github.com/AOROM/paperreading.git
-   cd paperreading
-   python -m pip install -r requirements.txt
-   ```
-
-2. Copy the skill directory into your Codex skills directory. Windows PowerShell example:
-
-   ```powershell
-   Copy-Item -Recurse -Force `
-     .\skills\papers-reading-skill `
-     "$env:USERPROFILE\.codex\skills\papers-reading-skill"
-   ```
-
-3. Start a new Codex session. Invoke the skill explicitly with `$papers-reading-skill`, or use a natural-language request about paper reading, 13-field extraction, or literature-review workbook updates.
-
-## Workbook configuration
-
-The public repository contains no personal workbook paths. The write script resolves its target in this order:
-
-1. The command-line option `--workbook <path>`;
-2. The `PAPER_READING_WORKBOOK` environment variable;
-3. If neither is provided, stop without writing.
-
-PowerShell:
-
-```powershell
-$env:PAPER_READING_WORKBOOK = "D:\research\paper-reading.xlsx"
-```
-
-Bash:
+### Use the Codex skill
 
 ```bash
-export PAPER_READING_WORKBOOK="/data/research/paper-reading.xlsx"
+git clone https://github.com/AOROM/paperreading.git
+cd paperreading
+python -m pip install -r requirements.txt
 ```
 
-## Usage
+Copy `skills/papers-reading-skill/` into your Codex skills directory, start a new Codex session, then invoke `$papers-reading-skill` or ask naturally for a structured paper review.
 
-Generate a draft without writing to a workbook:
+### Use the Python core
 
-```text
-Use $papers-reading-skill to read this paper and produce the 13 structured fields, but do not write to a workbook.
+The current core uses only the Python standard library:
+
+```python
+from paperreading import PaperRecord, EmpiricalDesign
+
+paper = PaperRecord(
+    title="Digital finance and firm innovation",
+    authors=["Author A", "Author B"],
+    research_questions=["Does digital finance affect firm innovation?"],
+    empirical_design=EmpiricalDesign(
+        explanatory_variables=["Digital finance"],
+        outcome_variables=["Innovation"],
+        fixed_effects=["Firm", "Year"],
+        identification="Two-way fixed effects",
+    ),
+)
+
+paper.validate()
 ```
 
-Append a validated result to the configured workbook:
+See [`examples/paper-record.example.json`](examples/paper-record.example.json) for the portable JSON representation.
 
-```text
-Use $papers-reading-skill to read this paper; after validating all fields, append it to the Chinese worksheet.
-```
+## Design principles
 
-Call the deterministic write script directly:
+- **Evidence before fluency:** important claims should be traceable to the source.
+- **Causal discipline:** correlation is not described as causality without an identification design that supports it.
+- **Structured but portable:** Excel is an export target, not the canonical data model.
+- **Research-oriented extensions:** follow-up ideas should specify an implementable identification strategy, sample, variable construction, mechanism test, outcome, or falsification test.
+- **No silent invention:** unknown metadata, rankings, methods, or evidence remain unknown.
 
-```bash
-python skills/papers-reading-skill/scripts/append_paper_reading.py \
-  --workbook "/path/to/paper-reading.xlsx" \
-  --sheet 中文 \
-  --data-json examples/paper-reading.example.json
-```
+## Roadmap
 
-Use `--sheet 中文` for a Chinese paper or `--sheet 英文` for an English paper. The script returns a JSON status such as `paper_appended`, `duplicate_skipped`, `schema_updated`, or `error`. If validation fails, the original workbook remains unchanged.
+The next milestones are tracked in [`ROADMAP.md`](ROADMAP.md):
 
-## Field and journal-ranking boundaries
+- evidence extraction and evidence-map rendering;
+- batch paper ingestion and richer literature matrices;
+- research-gap synthesis across papers;
+- Markdown / BibTeX / Zotero exporters;
+- benchmark datasets and hallucination/evidence metrics;
+- optional CLI, agent adapters, and web demo.
 
-See [`reading-fields.md`](skills/papers-reading-skill/references/reading-fields.md) for the field definitions. Record only journal-ranking labels confirmed by a reliable source, preserve the source system's original wording, and do not infer or translate classifications across ranking systems. For evaluation, promotion, research reporting, or submission decisions, verify the applicable system, version, and effective date.
-
-## Development and validation
+## Development
 
 ```bash
 python -m pip install -r requirements-dev.txt
@@ -108,10 +153,12 @@ python tools/validate_skill.py skills/papers-reading-skill
 python -m unittest discover -s tests -v
 ```
 
-GitHub Actions validates the skill metadata on every push and pull request and runs end-to-end tests for workbook updates, duplicate detection, environment-variable configuration, and failure-safe source preservation.
+See [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a change. Feature proposals are welcome through the GitHub issue templates.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a change.
+## Citation
+
+If PaperReading supports your research workflow, see [`CITATION.cff`](CITATION.cff) for citation metadata.
 
 ## License
 
-This repository currently has no open-source license. Public visibility does not automatically grant permission to copy, modify, or distribute its contents.
+MIT License. See [LICENSE](LICENSE).
