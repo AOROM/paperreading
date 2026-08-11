@@ -86,6 +86,8 @@ Status: planned; not implemented.
 
 ## Cross-version invariants
 
+These invariants are governed by the normative [Research Principles](RESEARCH_PRINCIPLES.md).
+
 1. Source claims, reported evidence, and researcher analysis remain distinct.
 2. Every derived cross-paper statement identifies its supporting records.
 3. Causal wording never becomes stronger than the identification evidence.

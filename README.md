@@ -24,6 +24,10 @@ A fluent summary is not the same as a defensible research asset. A reliable work
 
 PaperReading turns these questions into explicit schemas, validation rules, migration paths, and failure behavior.
 
+## Research constitution
+
+The normative [Research Principles](RESEARCH_PRINCIPLES.md) derive the project's decision rules from academic validity, traceability, falsifiability, reproducibility, and research ethics. They take precedence over compatibility, convenience, performance, and growth metrics. A capability that cannot state its research object, evidence, inference boundary, uncertainty, and failure behavior is not ready to ship.
+
 ## What is implemented
 
 | Capability | Status | Public contract |
@@ -219,6 +223,7 @@ The Skill is an adapter, not a second implementation. It respects the supplied s
 
 ```text
 paperreading/
+├── RESEARCH_PRINCIPLES*.md # Bilingual academic-research contract
 ├── src/paperreading/
 │   ├── domain/          # v0.2 and v0.3 strict models
 │   ├── ingestion/       # deterministic text/Markdown parser

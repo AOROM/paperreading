@@ -2,6 +2,13 @@
 
 All notable changes to PaperReading are documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- A bilingual, normative Research Principles contract derived from academic validity, evidence traceability, inference discipline, reproducibility, falsifiability, and research ethics.
+- A principle-based decision gate and research-integrity section in the contribution and pull-request workflows.
+
 ## [0.3.0] - 2026-08-11
 
 ### Added

@@ -2,10 +2,11 @@
 
 **English** | [简体中文](CONTRIBUTING.zh-CN.md)
 
-Thank you for improving PaperReading. Contributions must preserve evidence traceability, architectural boundaries, and backward compatibility.
+Thank you for improving PaperReading. The normative [Research Principles](RESEARCH_PRINCIPLES.md) govern every contribution. When research integrity conflicts with compatibility, convenience, performance, or growth, the principles take precedence.
 
 ## Project contract
 
+- Identify which principle IDs (P1–P12) a change affects and how the implementation enforces them.
 - Keep source claims, reported evidence, and researcher assessment distinguishable.
 - Preserve uncertainty and explicit null results; never fill missing information with invented content.
 - Require identification evidence before strengthening associative language into causal language.
@@ -86,3 +87,4 @@ State clearly:
 4. The source and version of any external material.
 5. How the change preserves evidence grounding and safe output behavior.
 6. Which roadmap capability becomes genuinely implemented, if any.
+7. Which Research Principles are affected, including any trade-off or residual limitation.
