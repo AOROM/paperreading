@@ -14,6 +14,7 @@
     <a href="https://github.com/AOROM/paperreading/actions/workflows/ci.yml"><img src="https://github.com/AOROM/paperreading/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
     <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&amp;logoColor=white" alt="Python 3.10 or newer">
     <img src="https://img.shields.io/badge/version-0.3.0-4C1" alt="Version 0.3.0">
+    <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2EA44F" alt="MIT License"></a>
     <a href="https://github.com/AOROM/paperreading/stargazers"><img src="https://img.shields.io/github/stars/AOROM/paperreading?style=flat&amp;logo=github&amp;label=Stars" alt="GitHub stars"></a>
   </p>
   <p><strong>English</strong> · <a href="README.zh-CN.md">简体中文</a></p>
@@ -256,7 +257,7 @@ The legacy `skills/papers-reading-skill/scripts/append_paper_reading.py` entry p
 
 ## Codex Skill
 
-Copy [`skills/papers-reading-skill`](skills/papers-reading-skill) into the Codex skills directory after installing the Core package, start a new session, and invoke `$papers-reading-skill`.
+Copy [`skills/papers-reading-skill`](skills/papers-reading-skill) into the Codex skills directory after installing the Core package, start a new session, and invoke `$papers-reading-skill`. The standalone Skill directory carries the same MIT license notice.
 
 The Skill is an adapter, not a second implementation. It respects the supplied source boundary, constructs a source-grounded package or compatible v0.2 record, runs Core validation, reports uncertainty, and requests authorization before workbook mutation.
 
@@ -269,11 +270,13 @@ The Skill is an adapter, not a second implementation. It respects the supplied s
 | [Contribution guide](CONTRIBUTING.md) | Architecture, schema evolution, compatibility, testing, and research-integrity checks |
 | [Security policy](SECURITY.md) | Private vulnerability-reporting guidance and supported-version policy |
 | [Changelog](CHANGELOG.md) | Versioned record of public capability and compatibility changes |
+| [MIT License](LICENSE) | Permission to use, copy, modify, distribute, sublicense, and sell the project |
 
 ## Project structure
 
 ```text
 paperreading/
+├── LICENSE                 # OSI-approved MIT open-source license
 ├── RESEARCH_PRINCIPLES*.md # Bilingual academic-research contract
 ├── docs/assets/            # Repository presentation assets and provenance
 ├── src/paperreading/
@@ -303,12 +306,16 @@ python -m mypy
 python tools/export_schemas.py --check
 python tools/generate_examples.py --check
 python tools/validate_skill.py skills/papers-reading-skill
+python tools/validate_license.py
 python -m unittest discover -s tests -v
 python -m pip wheel --no-deps --wheel-dir dist .
+python tools/validate_license.py --wheel-dir dist
 ```
 
 If this direction is useful to your research workflow, consider [starring the repository](https://github.com/AOROM/paperreading), opening an issue with a reproducible case, or contributing through [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-This repository currently has no open-source license. Public visibility does not automatically grant permission to copy, modify, or distribute its contents.
+PaperReading is open-source software released under the [MIT License](LICENSE). Unless a file states otherwise, the license covers the repository's source code, schemas, synthetic examples, documentation, and presentation assets.
+
+The MIT License does not grant rights to third-party papers, datasets, user-supplied inputs, or generated extracts. Those materials remain subject to their own copyright, privacy, confidentiality, consent, and redistribution terms.

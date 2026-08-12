@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=69"]
+requires = ["setuptools>=77.0.3"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,6 +8,8 @@ version = "0.3.0"
 description = "Evidence-grounded AI research workflow for reviewable paper artifacts"
 readme = "README.md"
 requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
 keywords = [
   "academic-research",
   "evidence-traceability",
@@ -45,6 +47,7 @@ Repository = "https://github.com/AOROM/paperreading"
 Issues = "https://github.com/AOROM/paperreading/issues"
 Changelog = "https://github.com/AOROM/paperreading/blob/main/CHANGELOG.md"
 Documentation = "https://github.com/AOROM/paperreading#readme"
+License = "https://github.com/AOROM/paperreading/blob/main/LICENSE"
 
 [tool.setuptools.packages.find]
 where = ["src"]

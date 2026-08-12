@@ -17,9 +17,12 @@ List the affected [Research Principles](https://github.com/AOROM/paperreading/bl
 - [ ] `python tools/export_schemas.py --check`
 - [ ] `python tools/generate_examples.py --check`
 - [ ] `python tools/validate_skill.py skills/papers-reading-skill`
+- [ ] `python tools/validate_license.py`
 - [ ] `python -m unittest discover -s tests -v`
 - [ ] v0.3 evidence IDs, verification state, and analysis boundaries remain valid
 - [ ] Affected Research Principles and residual limitations are documented
 - [ ] Legacy Excel behavior remains compatible or the migration is documented
 - [ ] No confidential papers, workbooks, credentials, or personal paths are included
 - [ ] External reference changes identify their source and policy version
+- [ ] I have the right to contribute all submitted material under the MIT License
+- [ ] Third-party material includes compatible license and attribution information

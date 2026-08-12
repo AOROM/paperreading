@@ -61,6 +61,15 @@ Traceability and confidence rules must remain deterministic and explainable. A c
 - Keep `ROADMAP.md` and `ROADMAP.zh-CN.md` semantically aligned.
 - Keep commands, paths, identifiers, and behavioral contracts identical across languages; translate explanatory prose only.
 
+## Licensing contributions
+
+PaperReading is distributed under the [MIT License](LICENSE). By submitting a contribution, you represent that you have the right to contribute it and agree that it will be distributed under the same license, unless a different arrangement is stated explicitly and accepted by the maintainers.
+
+- Preserve copyright, attribution, and license notices for any compatible third-party material.
+- Do not submit code, text, data, images, or extracted research content whose terms are incompatible with repository distribution.
+- Identify the source and license of incorporated external material in the pull request.
+- Remember that the repository's MIT License does not relicense papers, datasets, user inputs, confidential material, or generated extracts.
+
 ## Local checks
 
 ```bash
@@ -71,8 +80,10 @@ python -m mypy
 python tools/export_schemas.py --check
 python tools/generate_examples.py --check
 python tools/validate_skill.py skills/papers-reading-skill
+python tools/validate_license.py
 python -m unittest discover -s tests -v
 python -m pip wheel --no-deps --wheel-dir dist .
+python tools/validate_license.py --wheel-dir dist
 ```
 
 Workbook changes must cover successful append, duplicate no-op, schema mismatch with unchanged source, backup creation, and explicit or configured destination resolution. Core changes must cover schema rejection, unresolved evidence IDs, source-content verification states, causal-language boundaries, version migration, projection compatibility, and exporter failure behavior where applicable.
@@ -88,3 +99,4 @@ State clearly:
 5. How the change preserves evidence grounding and safe output behavior.
 6. Which roadmap capability becomes genuinely implemented, if any.
 7. Which Research Principles are affected, including any trade-off or residual limitation.
+8. Whether external material is included and, if so, its source, license, and redistribution basis.

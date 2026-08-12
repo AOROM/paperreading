@@ -61,6 +61,15 @@ domain <- migrations / ingestion / verification / validation / projections
 - 保持 `ROADMAP.md` 与 `ROADMAP.zh-CN.md` 语义一致。
 - 两种语言中的命令、路径、标识符和行为契约必须相同；只翻译说明文字。
 
+## 贡献许可
+
+PaperReading 依据 [MIT 许可证](LICENSE)分发。提交贡献即表示你确认自己有权贡献相关内容，并同意该贡献按同一许可证分发；如需其他安排，必须明确说明并获得维护者接受。
+
+- 保留兼容第三方材料中的版权、署名与许可证声明。
+- 不得提交许可条件与仓库分发不兼容的代码、文本、数据、图片或研究摘录。
+- 在 Pull Request 中注明所引入外部材料的来源与许可证。
+- 仓库的 MIT 许可证不会重新许可论文、数据集、用户输入、机密材料或生成摘录。
+
 ## 本地检查
 
 ```bash
@@ -71,8 +80,10 @@ python -m mypy
 python tools/export_schemas.py --check
 python tools/generate_examples.py --check
 python tools/validate_skill.py skills/papers-reading-skill
+python tools/validate_license.py
 python -m unittest discover -s tests -v
 python -m pip wheel --no-deps --wheel-dir dist .
+python tools/validate_license.py --wheel-dir dist
 ```
 
 工作簿变更必须覆盖正常追加、重复跳过、Schema 不匹配且源文件不变、备份创建，以及通过显式路径或配置解析目标。Core 变更应根据适用范围覆盖 Schema 拒绝、未解析证据 ID、来源正文核验状态、因果语言边界、版本迁移、投影兼容与 Exporter 失败行为。
@@ -88,3 +99,4 @@ python -m pip wheel --no-deps --wheel-dir dist .
 5. 变更如何保持证据约束和安全输出行为。
 6. 哪项路线图能力真正成为已实现功能（如适用）。
 7. 影响哪些 Research Principles，以及仍然存在的权衡或局限。
+8. 是否包含外部材料；如包含，说明其来源、许可证与再分发依据。

@@ -14,6 +14,7 @@
     <a href="https://github.com/AOROM/paperreading/actions/workflows/ci.yml"><img src="https://github.com/AOROM/paperreading/actions/workflows/ci.yml/badge.svg" alt="CI 状态"></a>
     <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&amp;logoColor=white" alt="Python 3.10 或更高版本">
     <img src="https://img.shields.io/badge/version-0.3.0-4C1" alt="版本 0.3.0">
+    <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2EA44F" alt="MIT 许可证"></a>
     <a href="https://github.com/AOROM/paperreading/stargazers"><img src="https://img.shields.io/github/stars/AOROM/paperreading?style=flat&amp;logo=github&amp;label=Stars" alt="GitHub Stars"></a>
   </p>
   <p><a href="README.md">English</a> · <strong>简体中文</strong></p>
@@ -262,7 +263,7 @@ paperreading export package.json literature.xlsx --format excel --sheet 中文
 
 ## Codex Skill
 
-安装 Core 后，将 [`skills/papers-reading-skill`](skills/papers-reading-skill) 复制到 Codex skills 目录，开启新会话并调用 `$papers-reading-skill`。
+安装 Core 后，将 [`skills/papers-reading-skill`](skills/papers-reading-skill) 复制到 Codex skills 目录，开启新会话并调用 `$papers-reading-skill`。可独立分发的 Skill 目录携带相同的 MIT 许可声明。
 
 Skill 是适配器，而不是第二套实现。它尊重用户提供的来源边界，构造来源约束的研究包或兼容 v0.2 记录，运行 Core 校验，报告不确定性，并在修改工作簿前请求授权。
 
@@ -275,11 +276,13 @@ Skill 是适配器，而不是第二套实现。它尊重用户提供的来源�
 | [贡献指南](CONTRIBUTING.zh-CN.md) | 架构、Schema 演进、兼容性、测试与研究诚信检查 |
 | [安全策略](SECURITY.md) | 漏洞私密报告方式与受支持版本策略 |
 | [变更日志](CHANGELOG.md) | 公开能力与兼容性变化的版本化记录 |
+| [MIT 许可证](LICENSE) | 使用、复制、修改、分发、再许可和销售本项目的授权条件 |
 
 ## 项目结构
 
 ```text
 paperreading/
+├── LICENSE                 # OSI 认可的 MIT 开源许可证
 ├── RESEARCH_PRINCIPLES*.md # 中英文规范性学术研究契约
 ├── docs/assets/            # 仓库展示资产及其溯源说明
 ├── src/paperreading/
@@ -309,12 +312,16 @@ python -m mypy
 python tools/export_schemas.py --check
 python tools/generate_examples.py --check
 python tools/validate_skill.py skills/papers-reading-skill
+python tools/validate_license.py
 python -m unittest discover -s tests -v
 python -m pip wheel --no-deps --wheel-dir dist .
+python tools/validate_license.py --wheel-dir dist
 ```
 
 如果这一方向对你的研究工作流有价值，欢迎为[仓库加星](https://github.com/AOROM/paperreading)、提交包含可复现案例的 Issue，或按照[中文贡献指南](CONTRIBUTING.zh-CN.md)参与建设。
 
 ## 许可
 
-本仓库目前未附加开源许可证。公开可见不等于自动授予复制、修改或分发权利。
+PaperReading 是依据 [MIT 许可证](LICENSE)发布的开源软件。除非文件另有声明，该许可证覆盖仓库中的源代码、Schema、合成示例、文档与展示资产。
+
+MIT 许可证不授予第三方论文、数据集、用户提供输入或生成摘录的权利；这些材料仍受其自身版权、隐私、保密、同意与再分发条款约束。

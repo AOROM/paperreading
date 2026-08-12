@@ -20,6 +20,8 @@ This document derives the project's non-negotiable logic from the minimum requir
 
 Legal authority, research ethics, privacy, consent, and source-licensing boundaries are hard constraints. Within those constraints, project decisions follow this priority order:
 
+PaperReading's repository materials are released under the [MIT License](LICENSE). That license governs the project software and associated documentation; it does not create permission to reuse third-party papers, datasets, user inputs, or extracted content.
+
 ```text
 epistemic integrity
   > auditability
@@ -75,7 +77,8 @@ paper-reported limitation != researcher-identified limitation
 research extension != finding reported by the paper
 unknown != absent != null result != not applicable != not run != failed
 not found in the reviewed corpus != absent from the literature
-public repository != open-source license
+public visibility != permission to reuse
+repository MIT License != rights to third-party research material
 ```
 
 Models, interfaces, exports, and documentation must preserve these distinctions. If a target format cannot represent them, the loss must be explicit and confined to a projection.
@@ -142,7 +145,7 @@ A change is complete only when, where applicable:
 | P6 | [Versioned migration](src/paperreading/migrations/v02_to_v03.py), schemas, deterministic examples, and `RunManifest`. |
 | P9 | [Legacy projection](src/paperreading/projections/legacy.py) remains outside the domain and is regression-tested. |
 | P10 | [Roadmap](ROADMAP.md), [tests](tests), and CI distinguish shipped contracts from hypotheses. |
-| P11, P12 | [Security policy](SECURITY.md), synthetic examples, mutation safeguards, and explicit documentation boundaries. |
+| P11, P12 | [Contribution licensing rules](CONTRIBUTING.md#licensing-contributions), [security policy](SECURITY.md), synthetic examples, mutation safeguards, and explicit documentation boundaries. |
 
 This map is descriptive, not proof of perfection. New evidence of a violated principle takes priority over preserving the current implementation.
 
