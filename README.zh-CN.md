@@ -13,7 +13,7 @@
   <p>
     <a href="https://github.com/AOROM/paperreading/actions/workflows/ci.yml"><img src="https://github.com/AOROM/paperreading/actions/workflows/ci.yml/badge.svg" alt="CI 状态"></a>
     <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&amp;logoColor=white" alt="Python 3.10 或更高版本">
-    <img src="https://img.shields.io/badge/version-0.3.0-4C1" alt="版本 0.3.0">
+    <img src="https://img.shields.io/badge/version-0.3.1-4C1" alt="版本 0.3.1">
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2EA44F" alt="MIT 许可证"></a>
     <a href="https://github.com/AOROM/paperreading/stargazers"><img src="https://img.shields.io/github/stars/AOROM/paperreading?style=flat&amp;logo=github&amp;label=Stars" alt="GitHub Stars"></a>
   </p>
@@ -31,7 +31,7 @@
 PaperReading 是一个处于 Alpha 阶段的 Python Core 与 Codex Skill，面向不满足于“流畅摘要”的研究者和研究工具开发者。它通过 Schema 与校验器保留从来源位置到研究主张的链路，区分论文报告内容与后续分析，约束因果语言，并让旧有研究导出继续保持可复核。
 
 > [!IMPORTANT]
-> **当前范围：**v0.3 支持 UTF-8 文本与 Markdown 摄取、v0.2 记录迁移、稳定 ID 证据规范化，以及正文位置和引文核验。它目前**不支持** PDF 解析、AI Provider 自动调用、批处理、SQLite 文献库搜索、多论文综合或自动研究缺口发现。
+> **当前范围：**v0.3.1 支持 UTF-8 文本、Markdown 与带文本层 PDF 的摄取；可通过可审计 JSON Provider 重放多阶段提取；强制执行 Draft → Review → Finalize；并使用局部模糊对齐核验引文。PDF 能力**不包含** OCR、版面几何、表格重建或图形提取。托管 AI Provider、批处理、SQLite 搜索、跨论文综合与自动 Gap 发现仍处于规划阶段。
 
 ## 从流畅摘要到可辩护的研究资产
 
@@ -72,20 +72,22 @@ paperreading validate examples/paper-package.example.json
 
 <a id="capabilities"></a>
 
-## v0.3 已交付能力
+## v0.3.1 已交付能力
 
 | 能力 | 状态 | 公开契约 |
 |---|---|---|
 | v0.3 研究包 | 已实现 | `PaperPackage` 分离文档、来源记录、规范化证据、分析、审计与运行元数据 |
-| 来源感知摄取 | 已实现 | 将 UTF-8 `.txt`、`.md`、`.markdown` 确定性解析为 `PaperDocument` 文本块 |
+| 来源感知摄取 | 已实现 | 通过统一 `DocumentParser` Port 确定性解析 UTF-8 文本、Markdown 与可选的带文本层 PDF |
+| 提取生命周期 | 已实现 | Provider 中立的多阶段提取、Candidate / Conflict 保留、显式人工复核和受控定稿 |
+| 离线 JSON Provider | 已实现 | 无网络调用、无隐藏模型依赖地重放可检查的候选值与证据输出 |
 | 证据图 | 已实现 | 研究对象通过稳定 ID 引用去重后的 `EvidenceSpan` 节点 |
-| 证据核验 | 已实现 | 核验来源、页码、文本块、章节、引文和文本哈希，并明确返回 `verified`、`partial` 或 `failed` |
+| 证据核验 v2 | 已实现 | 核验来源、页码、文本块、章节、文本哈希与局部窗口模糊引文，并返回显式状态 |
 | v0.2 迁移 | 已实现 | 确定性地将 `PaperRecord` 迁移为 `PaperPackage`，同时显式保留溯源局限 |
 | 分析分离 | 已实现 | 研究者判断和研究拓展位于来源记录之外 |
 | 因果语言守卫 | 已实现 | 因果表述要求合格设计和明确识别策略 |
 | 导出与兼容 | 已实现 | 无损 JSON、可复核 Markdown、旧版 13 字段投影与安全 Excel 追加 |
 | 本地项目存储 | 已实现 | `.paperreading/` 下的原子化、可检查 JSON 文件，无需数据库 |
-| PDF / Provider / 批处理 / 搜索 / 综合 / Gap | 规划中 | 按[路线图](ROADMAP.zh-CN.md)排序，绝不描述为已经交付 |
+| OCR / 托管 LLM / PDF 几何 / 批处理 / 搜索 / 综合 | 规划中 | 按[路线图](ROADMAP.zh-CN.md)排序，绝不描述为已经交付 |
 
 <a id="architecture"></a>
 
@@ -93,13 +95,16 @@ paperreading validate examples/paper-package.example.json
 
 ```mermaid
 flowchart LR
-    S["UTF-8 文本或 Markdown"] --> I["确定性摄取"]
+    S["文本 / Markdown / 带文本层 PDF"] --> I["Parser 适配器"]
     I --> D["PaperDocument"]
+    D --> E["Provider 多阶段提取"]
+    E --> R["PaperDraft：候选值 + 冲突"]
+    R --> H["显式人工复核"]
+    H --> P["定稿 PaperPackage"]
     V2["v0.2 PaperRecord"] --> M["确定性迁移"]
     M --> P["v0.3 PaperPackage"]
     D --> V["证据核验器"]
     P --> V
-    A["Skill 或提取适配器"] --> P
     V --> O{"已校验研究资产"}
     O --> J["JSON"]
     O --> MD["Markdown"]
@@ -122,10 +127,10 @@ Domain 层不导入 Typer、OpenPyXL、模型 SDK、存储适配器或 Codex Run
 
 ## 探索命令工作流
 
-只有需要 Excel 能力时才安装对应可选依赖：
+只有需要 PDF 或 Excel 适配器时才安装对应可选依赖：
 
 ```bash
-python -m pip install -e ".[excel]"
+python -m pip install -e ".[pdf,excel]"
 ```
 
 初始化一个可检查的本地项目：
@@ -141,6 +146,24 @@ paperreading init
 ```bash
 paperreading ingest examples/source.example.md
 ```
+
+运行完整且无网络依赖的 Draft → Review → Finalize 示例：
+
+```bash
+paperreading ingest examples/source.example.md --output document.json
+paperreading extract document.json \
+  --provider-manifest examples/extraction-manifest.example.json \
+  --output bundle.json
+paperreading review bundle.json \
+  --decisions examples/review-decisions.example.json \
+  --output reviewed.json
+paperreading finalize reviewed.json \
+  --document document.json \
+  --output package.json
+paperreading verify package.json --document document.json --strict
+```
+
+需要项目 Repository 时，`paperreading read` 会合并摄取与提取。JSON Provider 是面向评估和集成的确定性重放适配器，并非托管 LLM。未来模型适配器必须实现同一 Provider 契约，并保留候选证据、不确定性与运行元数据。
 
 在不修改项目的情况下测试确定性的 v0.2 迁移：
 
@@ -167,7 +190,7 @@ paperreading verify package.json \
   --output verified-package.json
 ```
 
-仓库内置的摄取示例与迁移示例用于测试不同契约，二者不会自动关联。在 v0.3 中，Skill 或其他提取适配器负责构造与来源关联的研究包；PaperReading 本身还不会从任意文本自动推断完整研究记录。
+提取示例与合成 Markdown 来源相互关联，可以端到端通过严格核验；其中材料完全虚构，不可引用。对任意论文进行提取仍需要兼容 Provider；PaperReading 不会静默调用模型，也不会声称具备 OCR 能力。
 
 ## v0.3 研究资产模型
 
@@ -272,6 +295,7 @@ Skill 是适配器，而不是第二套实现。它尊重用户提供的来源�
 | 文档 | 用途 |
 |---|---|
 | [《学术研究底层逻辑》](RESEARCH_PRINCIPLES.zh-CN.md) | 有效性、证据、推断、不确定性、可复现性与伦理的规范性规则 |
+| [架构说明](docs/architecture.zh-CN.md) | Parser / Provider Port、研究资产生命周期、身份规则与定稿守卫 |
 | [路线图](ROADMAP.zh-CN.md) | 已交付边界、规划假说、里程碑与发布门禁 |
 | [贡献指南](CONTRIBUTING.zh-CN.md) | 架构、Schema 演进、兼容性、测试与研究诚信检查 |
 | [安全策略](SECURITY.md) | 漏洞私密报告方式与受支持版本策略 |
@@ -287,7 +311,8 @@ paperreading/
 ├── docs/assets/            # 仓库展示资产及其溯源说明
 ├── src/paperreading/
 │   ├── domain/          # v0.2 与 v0.3 严格模型
-│   ├── ingestion/       # 确定性文本 / Markdown 解析器
+│   ├── ingestion/       # 文本、Markdown 与可选带文本层 PDF 解析器
+│   ├── providers/       # 提取协议与离线 JSON 适配器
 │   ├── migrations/      # 版本间转换
 │   ├── verification/    # 来源正文证据检查
 │   ├── validation/      # 证据状态与因果语言规则
@@ -305,7 +330,7 @@ paperreading/
 ## 开发
 
 ```bash
-python -m pip install -e ".[excel,dev]"
+python -m pip install -e ".[excel,pdf,dev]"
 python -m ruff check .
 python -m ruff format --check .
 python -m mypy

@@ -1,1 +1,1 @@
--e .[excel,dev]
+-e .[excel,pdf,dev]

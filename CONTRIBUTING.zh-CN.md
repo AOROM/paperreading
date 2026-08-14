@@ -19,13 +19,15 @@
 允许的依赖方向为：
 
 ```text
-domain <- migrations / ingestion / verification / validation / projections
+domain <- migrations / ingestion / providers / verification / validation / projections
        <- application use cases <- CLI / Skill / exporters / repositories
 ```
 
 - `src/paperreading/domain/` 不得导入 Typer、OpenPyXL、AI SDK、Codex、Storage 或 Exporter。
 - 工作簿专属逻辑只能放在 `src/paperreading/exporters/excel.py`。
 - CLI 行为只能放在 `src/paperreading/cli.py`；可复用编排进入 `application/`，可替换持久化必须位于 `repositories/base.py` 之后。
+- Provider SDK 必须位于 Domain 之外。Provider Adapter 必须返回类型化 Candidate 与 Evidence、保留未决状态、不得自行声明核验状态，并且不得在 Run Metadata 中存储密钥。
+- Parser Adapter 必须说明能够保留和不能核验的来源表面；扫描 PDF 不得被描述为已成功解析的文本。
 - 将 v0.3 `PaperPackage` 视为当前研究资产，并将 v0.2 `PaperRecord` 继续作为受支持的兼容契约。
 - 来源派生字段只进入 `GroundedPaperRecord`；研究者或 AI 辅助解释必须进入 `ResearchAnalysis`。
 - 旧版工作簿变更必须通过 `to_legacy_13_fields` 实现，并保留兼容性测试。
@@ -73,7 +75,7 @@ PaperReading 依据 [MIT 许可证](LICENSE)分发。提交贡献即表示你确
 ## 本地检查
 
 ```bash
-python -m pip install -e ".[excel,dev]"
+python -m pip install -e ".[excel,pdf,dev]"
 python -m ruff check .
 python -m ruff format --check .
 python -m mypy

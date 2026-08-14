@@ -315,7 +315,7 @@ class V03InterfaceAndContractTests(unittest.TestCase):
             )
 
     def test_versioned_schemas_and_examples_are_current(self) -> None:
-        self.assertEqual(__version__, "0.3.0")
+        self.assertEqual(__version__, "0.3.1")
         commands = (
             [sys.executable, "tools/export_schemas.py", "--check"],
             [sys.executable, "tools/generate_examples.py", "--check"],
@@ -336,6 +336,9 @@ class V03InterfaceAndContractTests(unittest.TestCase):
             "schemas/v0.3/document.schema.json",
             "schemas/v0.3/draft.schema.json",
             "schemas/v0.3/evidence-span.schema.json",
+            "schemas/v0.3/extraction-bundle.schema.json",
+            "schemas/v0.3/extraction-manifest.schema.json",
+            "schemas/v0.3/review-decisions.schema.json",
         )
         self.assertTrue(all((ROOT / path).is_file() for path in expected))
 

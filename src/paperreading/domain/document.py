@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import re
+import unicodedata
 from datetime import datetime
 from enum import Enum
 from typing import Literal
@@ -119,3 +120,16 @@ class PaperDocument(DomainModel):
 
     def block_index(self) -> dict[str, DocumentBlock]:
         return {block.block_id: block for page in self.pages for block in page.blocks}
+
+    @property
+    def canonical_text_sha256(self) -> str:
+        """Hash normalized extracted text independently from the source bytes."""
+
+        canonical_pages = [
+            unicodedata.normalize("NFC", page.text)
+            .replace("\r\n", "\n")
+            .replace("\r", "\n")
+            for page in self.pages
+        ]
+        canonical = "\f".join(canonical_pages)
+        return hashlib.sha256(canonical.encode("utf-8")).hexdigest()

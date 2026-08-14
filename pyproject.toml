@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "paperreading"
-version = "0.3.0"
+version = "0.3.1"
 description = "Evidence-grounded AI research workflow for reviewable paper artifacts"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -32,6 +32,7 @@ dependencies = [
 
 [project.optional-dependencies]
 excel = ["openpyxl>=3.1,<4"]
+pdf = ["pypdf>=6.12,<7"]
 dev = [
   "mypy>=1.15,<2",
   "PyYAML>=6,<7",

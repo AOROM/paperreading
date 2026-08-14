@@ -3,6 +3,7 @@
 from paperreading.verification.evidence import (
     PackageVerificationReport,
     apply_verification,
+    best_quote_match,
     verify_package,
     verify_span,
 )
@@ -10,6 +11,7 @@ from paperreading.verification.evidence import (
 __all__ = [
     "PackageVerificationReport",
     "apply_verification",
+    "best_quote_match",
     "verify_package",
     "verify_span",
 ]

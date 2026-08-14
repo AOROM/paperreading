@@ -1,0 +1,28 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "selections": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Selections",
+      "type": "object"
+    },
+    "dismissed_unresolved_fields": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Dismissed Unresolved Fields",
+      "type": "array"
+    },
+    "notes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Notes",
+      "type": "array"
+    }
+  },
+  "title": "ReviewDecisions",
+  "type": "object"
+}

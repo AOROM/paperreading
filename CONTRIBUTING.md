@@ -19,13 +19,15 @@ Thank you for improving PaperReading. The normative [Research Principles](RESEAR
 The allowed dependency direction is:
 
 ```text
-domain <- migrations / ingestion / verification / validation / projections
+domain <- migrations / ingestion / providers / verification / validation / projections
        <- application use cases <- CLI / Skill / exporters / repositories
 ```
 
 - `src/paperreading/domain/` must not import Typer, OpenPyXL, an AI SDK, Codex, storage, or an exporter.
 - Put workbook-specific logic only in `src/paperreading/exporters/excel.py`.
 - Put CLI behavior only in `src/paperreading/cli.py`; reusable orchestration belongs in `application/`, and replaceable persistence belongs behind `repositories/base.py`.
+- Keep provider SDKs outside the domain. Provider adapters must return typed candidates and evidence, preserve unresolved state, never assert verification state, and never store secrets in run metadata.
+- Parser adapters must state which source surfaces they preserve and which they cannot verify; scanned PDFs must not be represented as successfully parsed text.
 - Treat v0.3 `PaperPackage` as the current research asset. Preserve v0.2 `PaperRecord` as a supported compatibility contract.
 - Keep source-derived fields in `GroundedPaperRecord`; researcher or AI-assisted interpretation belongs in `ResearchAnalysis`.
 - Implement legacy workbook changes through `to_legacy_13_fields` and retain compatibility tests.
@@ -73,7 +75,7 @@ PaperReading is distributed under the [MIT License](LICENSE). By submitting a co
 ## Local checks
 
 ```bash
-python -m pip install -e ".[excel,dev]"
+python -m pip install -e ".[excel,pdf,dev]"
 python -m ruff check .
 python -m ruff format --check .
 python -m mypy

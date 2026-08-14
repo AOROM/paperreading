@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import re
+import unicodedata
 from difflib import SequenceMatcher
 
 from pydantic import Field
@@ -24,11 +25,66 @@ from paperreading.validation.result import (
 
 
 def _normalize(text: str) -> str:
-    return re.sub(r"\s+", " ", text).strip()
+    return re.sub(r"\s+", " ", unicodedata.normalize("NFC", text)).strip()
 
 
 def _hash_text(text: str) -> str:
     return hashlib.sha256(_normalize(text).encode("utf-8")).hexdigest()
+
+
+def best_quote_match(quoted_text: str, context: str) -> float:
+    """Score a quote against likely local windows, not an entire long block."""
+
+    quoted = _normalize(quoted_text)
+    normalized_context = _normalize(context)
+    if not quoted or not normalized_context:
+        return 0.0
+    if quoted in normalized_context:
+        return 1.0
+
+    quote_length = len(quoted)
+    context_length = len(normalized_context)
+    if context_length <= quote_length:
+        return round(
+            SequenceMatcher(
+                None,
+                quoted,
+                normalized_context,
+                autojunk=False,
+            ).ratio(),
+            3,
+        )
+
+    matcher = SequenceMatcher(None, quoted, normalized_context, autojunk=False)
+    starts = {0, max(0, context_length - quote_length)}
+    radius = min(8, max(2, quote_length // 50))
+    for block in matcher.get_matching_blocks():
+        if block.size == 0:
+            continue
+        estimated = max(0, min(context_length - 1, block.b - block.a))
+        starts.update(
+            range(
+                max(0, estimated - radius), min(context_length, estimated + radius + 1)
+            )
+        )
+
+    tolerance = min(40, max(2, round(quote_length * 0.12)))
+    lengths = {
+        max(1, quote_length - tolerance),
+        max(1, quote_length - tolerance // 2),
+        quote_length,
+        quote_length + tolerance // 2,
+        quote_length + tolerance,
+    }
+    best = 0.0
+    for start in starts:
+        for length in lengths:
+            window = normalized_context[start : min(context_length, start + length)]
+            if not window:
+                continue
+            score = SequenceMatcher(None, quoted, window, autojunk=False).ratio()
+            best = max(best, score)
+    return round(best, 3)
 
 
 class PackageVerificationReport(DomainModel):
@@ -89,12 +145,7 @@ def verify_span(
         if context is None:
             issues.append("quoted text cannot be checked without a resolved context")
         else:
-            normalized_context = _normalize(context)
-            quote_match = (
-                1.0
-                if quoted in normalized_context
-                else round(SequenceMatcher(None, quoted, normalized_context).ratio(), 3)
-            )
+            quote_match = best_quote_match(quoted, context)
             if quote_match < minimum_quote_match:
                 issues.append(
                     "quoted text does not meet the configured match threshold"
@@ -166,6 +217,7 @@ def verify_span(
         quote_match=quote_match,
         text_hash_match=text_hash_match,
         issues=issues,
+        verifier_version="0.3.1",
     )
 
 

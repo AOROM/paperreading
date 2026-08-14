@@ -753,7 +753,7 @@
           "type": "array"
         },
         "verifier_version": {
-          "default": "0.3.0",
+          "default": "0.3.1",
           "title": "Verifier Version",
           "type": "string"
         }
@@ -1146,7 +1146,7 @@
           "type": "array"
         },
         "auditor_version": {
-          "default": "0.3.0",
+          "default": "0.3.1",
           "title": "Auditor Version",
           "type": "string"
         }
@@ -1412,7 +1412,7 @@
           "type": "string"
         },
         "pipeline_version": {
-          "default": "0.3.0",
+          "default": "0.3.1",
           "title": "Pipeline Version",
           "type": "string"
         },
@@ -1428,6 +1428,19 @@
           ],
           "default": null,
           "title": "Source Sha256"
+        },
+        "canonical_text_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Canonical Text Sha256"
         },
         "config_hash": {
           "anyOf": [
@@ -1453,6 +1466,18 @@
           ],
           "default": null,
           "title": "Provider"
+        },
+        "provider_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provider Version"
         },
         "model": {
           "anyOf": [

@@ -1,0 +1,365 @@
+{
+  "schema_version": "1",
+  "source_id": "src-71d44b2df3b1a681",
+  "provider": "offline-json",
+  "provider_version": "1.0.0",
+  "stages": {
+    "metadata": {
+      "candidates": [
+        {
+          "candidate_id": "cand-paper-id",
+          "field_path": "record.paper_id",
+          "value": "synthetic-demo",
+          "evidence_ids": [],
+          "extractor": "offline-json",
+          "prompt_version": "fixture-1"
+        },
+        {
+          "candidate_id": "cand-record-type",
+          "field_path": "record.record_type",
+          "value": "other",
+          "evidence_ids": [],
+          "extractor": "offline-json",
+          "prompt_version": "fixture-1"
+        },
+        {
+          "candidate_id": "cand-metadata",
+          "field_path": "record.metadata",
+          "value": {
+            "title": "Synthetic source for ingestion",
+            "authors": [
+              "Unknown"
+            ],
+            "source_id": "src-71d44b2df3b1a681",
+            "language": "en",
+            "keywords": [
+              "synthetic example"
+            ]
+          },
+          "evidence_ids": [
+            "ev-title"
+          ],
+          "extractor": "offline-json",
+          "prompt_version": "fixture-1"
+        },
+        {
+          "candidate_id": "cand-field-evidence",
+          "field_path": "record.field_evidence",
+          "value": {
+            "metadata.title": [
+              "ev-title"
+            ]
+          },
+          "evidence_ids": [
+            "ev-title"
+          ],
+          "extractor": "offline-json",
+          "prompt_version": "fixture-1"
+        }
+      ],
+      "evidence_index": {
+        "ev-title": {
+          "evidence_id": "ev-title",
+          "source_id": "src-71d44b2df3b1a681",
+          "type": "TEXT",
+          "page": 1,
+          "section_path": [
+            "Synthetic source for ingestion"
+          ],
+          "block_id": "p1-b0001",
+          "char_start": 2,
+          "char_end": 32,
+          "quoted_text": "Synthetic source for ingestion",
+          "text_hash": "ba2eaa80989f19b1f45bde0353ae6d1e355c7edb0e7cd607555181880c16c303",
+          "traceability": {
+            "score": 0.98,
+            "level": "high",
+            "reasons": [
+              "source_id is present",
+              "page, block, and character range are present",
+              "score measures traceability specificity only"
+            ],
+            "scoring_version": "1"
+          }
+        }
+      },
+      "unresolved_fields": [],
+      "issues": [],
+      "prompt_version": "fixture-1"
+    },
+    "research_questions": {
+      "candidates": [
+        {
+          "candidate_id": "cand-questions",
+          "field_path": "record.research_questions",
+          "value": [
+            "Does a hypothetical digital coordination tool change specialization in a synthetic panel of firms?"
+          ],
+          "evidence_ids": [
+            "ev-question"
+          ],
+          "extractor": "offline-json",
+          "prompt_version": "fixture-1"
+        }
+      ],
+      "evidence_index": {
+        "ev-question": {
+          "evidence_id": "ev-question",
+          "source_id": "src-71d44b2df3b1a681",
+          "type": "TEXT",
+          "page": 1,
+          "section_path": [
+            "Synthetic source for ingestion",
+            "Research question"
+          ],
+          "block_id": "p1-b0004",
+          "char_start": 209,
+          "char_end": 307,
+          "quoted_text": "Does a hypothetical digital coordination tool change specialization in a\nsynthetic panel of firms?",
+          "text_hash": "b70227ddc9c222822cd5602a317c29aa1e681d77b192ee642d204d36721f0c8e",
+          "traceability": {
+            "score": 0.98,
+            "level": "high",
+            "reasons": [
+              "source_id is present",
+              "page, block, and character range are present",
+              "score measures traceability specificity only"
+            ],
+            "scoring_version": "1"
+          }
+        }
+      },
+      "unresolved_fields": [],
+      "issues": [],
+      "prompt_version": "fixture-1"
+    },
+    "theory": {
+      "candidates": [
+        {
+          "candidate_id": "cand-theory",
+          "field_path": "record.theoretical_framework",
+          "value": {},
+          "evidence_ids": [],
+          "extractor": "offline-json",
+          "prompt_version": "fixture-1"
+        }
+      ],
+      "evidence_index": {},
+      "unresolved_fields": [],
+      "issues": [],
+      "prompt_version": "fixture-1"
+    },
+    "data": {
+      "candidates": [
+        {
+          "candidate_id": "cand-data",
+          "field_path": "record.data",
+          "value": {
+            "sample": "synthetic panel of firms"
+          },
+          "evidence_ids": [
+            "ev-question"
+          ],
+          "extractor": "offline-json",
+          "prompt_version": "fixture-1"
+        }
+      ],
+      "evidence_index": {
+        "ev-question": {
+          "evidence_id": "ev-question",
+          "source_id": "src-71d44b2df3b1a681",
+          "type": "TEXT",
+          "page": 1,
+          "section_path": [
+            "Synthetic source for ingestion",
+            "Research question"
+          ],
+          "block_id": "p1-b0004",
+          "char_start": 209,
+          "char_end": 307,
+          "quoted_text": "Does a hypothetical digital coordination tool change specialization in a\nsynthetic panel of firms?",
+          "text_hash": "b70227ddc9c222822cd5602a317c29aa1e681d77b192ee642d204d36721f0c8e",
+          "traceability": {
+            "score": 0.98,
+            "level": "high",
+            "reasons": [
+              "source_id is present",
+              "page, block, and character range are present",
+              "score measures traceability specificity only"
+            ],
+            "scoring_version": "1"
+          }
+        }
+      },
+      "unresolved_fields": [],
+      "issues": [],
+      "prompt_version": "fixture-1"
+    },
+    "variables": {
+      "candidates": [
+        {
+          "candidate_id": "cand-variables",
+          "field_path": "record.variables",
+          "value": [],
+          "evidence_ids": [],
+          "extractor": "offline-json",
+          "prompt_version": "fixture-1"
+        }
+      ],
+      "evidence_index": {},
+      "unresolved_fields": [],
+      "issues": [],
+      "prompt_version": "fixture-1"
+    },
+    "findings": {
+      "candidates": [
+        {
+          "candidate_id": "cand-source-claims",
+          "field_path": "record.source_claims",
+          "value": [
+            {
+              "claim_id": "claim-question",
+              "statement": "Does a hypothetical digital coordination tool change specialization in a synthetic panel of firms?",
+              "evidence_ids": [
+                "ev-question"
+              ]
+            }
+          ],
+          "evidence_ids": [
+            "ev-question"
+          ],
+          "extractor": "offline-json",
+          "prompt_version": "fixture-1"
+        },
+        {
+          "candidate_id": "cand-findings",
+          "field_path": "record.findings",
+          "value": [
+            {
+              "finding_id": "finding-demo",
+              "statement": "In the synthetic example, tool adoption is associated with higher measured specialization.",
+              "relationship": "positive",
+              "language_strength": "associational",
+              "evidence_ids": [
+                "ev-finding"
+              ]
+            }
+          ],
+          "evidence_ids": [
+            "ev-finding"
+          ],
+          "extractor": "offline-json",
+          "prompt_version": "fixture-1"
+        }
+      ],
+      "evidence_index": {
+        "ev-question": {
+          "evidence_id": "ev-question",
+          "source_id": "src-71d44b2df3b1a681",
+          "type": "TEXT",
+          "page": 1,
+          "section_path": [
+            "Synthetic source for ingestion",
+            "Research question"
+          ],
+          "block_id": "p1-b0004",
+          "char_start": 209,
+          "char_end": 307,
+          "quoted_text": "Does a hypothetical digital coordination tool change specialization in a\nsynthetic panel of firms?",
+          "text_hash": "b70227ddc9c222822cd5602a317c29aa1e681d77b192ee642d204d36721f0c8e",
+          "traceability": {
+            "score": 0.98,
+            "level": "high",
+            "reasons": [
+              "source_id is present",
+              "page, block, and character range are present",
+              "score measures traceability specificity only"
+            ],
+            "scoring_version": "1"
+          }
+        },
+        "ev-finding": {
+          "evidence_id": "ev-finding",
+          "source_id": "src-71d44b2df3b1a681",
+          "type": "TEXT",
+          "page": 1,
+          "section_path": [
+            "Synthetic source for ingestion",
+            "Reported result"
+          ],
+          "block_id": "p1-b0006",
+          "char_start": 329,
+          "char_end": 419,
+          "quoted_text": "In the synthetic example, tool adoption is associated with higher measured\nspecialization.",
+          "text_hash": "35d8b8fc40d80141ebd6319a08584bf5687560e09a048173c2650ff967581350",
+          "traceability": {
+            "score": 0.98,
+            "level": "high",
+            "reasons": [
+              "source_id is present",
+              "page, block, and character range are present",
+              "score measures traceability specificity only"
+            ],
+            "scoring_version": "1"
+          }
+        }
+      },
+      "unresolved_fields": [],
+      "issues": [],
+      "prompt_version": "fixture-1"
+    },
+    "limitations": {
+      "candidates": [
+        {
+          "candidate_id": "cand-limitations",
+          "field_path": "record.limitations",
+          "value": [
+            {
+              "limitation_id": "limitation-demo",
+              "statement": "All entities, observations, and results in this example are fictional.",
+              "origin": "paper",
+              "evidence_ids": [
+                "ev-limitation"
+              ]
+            }
+          ],
+          "evidence_ids": [
+            "ev-limitation"
+          ],
+          "extractor": "offline-json",
+          "prompt_version": "fixture-1"
+        }
+      ],
+      "evidence_index": {
+        "ev-limitation": {
+          "evidence_id": "ev-limitation",
+          "source_id": "src-71d44b2df3b1a681",
+          "type": "TEXT",
+          "page": 1,
+          "section_path": [
+            "Synthetic source for ingestion",
+            "Limitation"
+          ],
+          "block_id": "p1-b0008",
+          "char_start": 544,
+          "char_end": 614,
+          "quoted_text": "All entities, observations, and results in this example are fictional.",
+          "text_hash": "9eecff65784bf52c8b5268a5e3c1b72719a96a837e36d068f4ed28fa162e7637",
+          "traceability": {
+            "score": 0.98,
+            "level": "high",
+            "reasons": [
+              "source_id is present",
+              "page, block, and character range are present",
+              "score measures traceability specificity only"
+            ],
+            "scoring_version": "1"
+          }
+        }
+      },
+      "unresolved_fields": [],
+      "issues": [],
+      "prompt_version": "fixture-1"
+    }
+  }
+}

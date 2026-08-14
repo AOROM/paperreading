@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Annotated, NoReturn
 
@@ -10,7 +11,16 @@ import typer
 from pydantic import ValidationError
 
 from paperreading import __version__
-from paperreading.application import IngestDocument, MigrateRecord, VerifyPackage
+from paperreading.application import (
+    ExtractDocument,
+    ExtractionBundle,
+    FinalizeDraft,
+    IngestDocument,
+    MigrateRecord,
+    ReviewDecisions,
+    ReviewDraft,
+    VerifyPackage,
+)
 from paperreading.artifacts import ResearchArtifact, load_artifact
 from paperreading.config import load_config
 from paperreading.domain import (
@@ -25,6 +35,7 @@ from paperreading.domain.base import DomainModel
 from paperreading.exporters import ExportFormat, JsonExporter, MarkdownExporter
 from paperreading.exporters.text import atomic_write_text
 from paperreading.projections import to_legacy_13_fields
+from paperreading.providers import JsonExtractionManifest, JsonExtractionProvider
 from paperreading.repositories import FileRepository
 from paperreading.validation import validate_package, validate_record
 from paperreading.validation.result import ValidationReport
@@ -47,6 +58,28 @@ def _abort(message: str, *, code: int = 1) -> NoReturn:
 
 def _print_json(payload: object) -> None:
     typer.echo(json.dumps(payload, ensure_ascii=False, indent=2))
+
+
+def _optional_datetime(value: str | None, *, option: str) -> datetime | None:
+    if value is None:
+        return None
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError(
+            f"{option} must be an ISO 8601 timestamp with a timezone"
+        ) from exc
+
+
+def _model_json(model: DomainModel) -> str:
+    return (
+        json.dumps(
+            model.model_dump(mode="json", exclude_none=True),
+            ensure_ascii=False,
+            indent=2,
+        )
+        + "\n"
+    )
 
 
 def _artifact_report(
@@ -172,33 +205,253 @@ def ingest(
     source: Annotated[Path, typer.Argument(exists=True, dir_okay=False, readable=True)],
     project: Annotated[Path, typer.Option("--project")] = Path("."),
     output: Annotated[Path | None, typer.Option("--output", "-o")] = None,
+    ingested_at: Annotated[
+        str | None,
+        typer.Option(
+            "--ingested-at",
+            help="ISO 8601 timestamp with timezone for reproducible ingestion.",
+        ),
+    ] = None,
     force: Annotated[bool, typer.Option("--force")] = False,
 ) -> None:
-    """Ingest a UTF-8 text or Markdown source into a PaperDocument."""
+    """Ingest UTF-8 text, Markdown, or a text-based PDF."""
 
     try:
         repository = FileRepository(project)
-        document, destination = IngestDocument(repository).execute(source, force=force)
+        document, destination = IngestDocument(repository).execute(
+            source,
+            ingested_at=_optional_datetime(ingested_at, option="--ingested-at"),
+            force=force,
+        )
         if output is not None and output.expanduser().resolve() != destination:
-            content = (
-                json.dumps(
-                    document.model_dump(mode="json", exclude_none=True),
-                    ensure_ascii=False,
-                    indent=2,
-                )
-                + "\n"
-            )
-            atomic_write_text(output, content, force=force)
-    except (OSError, UnicodeError, ValidationError, ValueError) as exc:
+            atomic_write_text(output, _model_json(document), force=force)
+    except (OSError, RuntimeError, UnicodeError, ValidationError, ValueError) as exc:
         _abort(str(exc), code=2)
     _print_json(
         {
             "action": "document_ingested",
             "document_id": document.document_id,
             "format": document.manifest.format.value,
+            "pages": len(document.pages),
             "blocks": sum(len(page.blocks) for page in document.pages),
+            "source_sha256": document.manifest.sha256,
+            "canonical_text_sha256": document.canonical_text_sha256,
             "repository_path": str(destination),
             "output": str(output.expanduser().resolve()) if output else None,
+        }
+    )
+
+
+@app.command()
+def extract(
+    document: Annotated[
+        Path, typer.Argument(exists=True, dir_okay=False, readable=True)
+    ],
+    provider_manifest: Annotated[
+        Path,
+        typer.Option(
+            "--provider-manifest",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help="Auditable staged extraction JSON.",
+        ),
+    ],
+    output: Annotated[Path, typer.Option("--output", "-o")],
+    project: Annotated[Path, typer.Option("--project")] = Path("."),
+    created_at: Annotated[
+        str | None,
+        typer.Option("--created-at", help="ISO 8601 timestamp with timezone."),
+    ] = None,
+    persist: Annotated[
+        bool, typer.Option("--persist", help="Also save the draft in the project.")
+    ] = False,
+    force: Annotated[bool, typer.Option("--force")] = False,
+) -> None:
+    """Create an evidence-bearing draft through an extraction provider."""
+
+    try:
+        paper_document = PaperDocument.model_validate_json(
+            document.read_text(encoding="utf-8")
+        )
+        provider = JsonExtractionProvider.from_path(provider_manifest)
+        repository = FileRepository(project) if persist else None
+        bundle, destination = ExtractDocument(repository).execute(
+            paper_document,
+            provider,
+            created_at=_optional_datetime(created_at, option="--created-at"),
+            persist=persist,
+            force=force,
+        )
+        atomic_write_text(output, _model_json(bundle), force=force)
+    except (OSError, json.JSONDecodeError, ValidationError, ValueError) as exc:
+        _abort(str(exc), code=2)
+    _print_json(
+        {
+            "action": "draft_extracted",
+            "draft_id": bundle.draft.draft_id,
+            "status": bundle.draft.status.value,
+            "candidates": len(bundle.draft.candidates),
+            "conflicts": len(bundle.draft.conflicts),
+            "unresolved_fields": bundle.draft.unresolved_fields,
+            "output": str(output.expanduser().resolve()),
+            "repository_path": str(destination) if destination else None,
+        }
+    )
+
+
+@app.command()
+def review(
+    bundle: Annotated[Path, typer.Argument(exists=True, dir_okay=False, readable=True)],
+    output: Annotated[Path, typer.Option("--output", "-o")],
+    decisions: Annotated[
+        Path | None,
+        typer.Option(
+            "--decisions",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help="JSON with selections, dismissed_unresolved_fields, and notes.",
+        ),
+    ] = None,
+    force: Annotated[bool, typer.Option("--force")] = False,
+) -> None:
+    """Resolve extraction ambiguity through explicit human decisions."""
+
+    try:
+        extraction_bundle = ExtractionBundle.model_validate_json(
+            bundle.read_text(encoding="utf-8")
+        )
+        review_decisions = (
+            ReviewDecisions.model_validate_json(decisions.read_text(encoding="utf-8"))
+            if decisions
+            else ReviewDecisions()
+        )
+        reviewed = ReviewDraft().execute(
+            extraction_bundle,
+            selections=review_decisions.selections,
+            dismissed_unresolved_fields=review_decisions.dismissed_unresolved_fields,
+            notes=review_decisions.notes,
+        )
+        atomic_write_text(output, _model_json(reviewed), force=force)
+    except (OSError, json.JSONDecodeError, ValidationError, ValueError) as exc:
+        _abort(str(exc), code=2)
+    _print_json(
+        {
+            "action": "draft_reviewed",
+            "draft_id": reviewed.draft.draft_id,
+            "status": reviewed.draft.status.value,
+            "conflicts": len(reviewed.draft.conflicts),
+            "unresolved_fields": reviewed.draft.unresolved_fields,
+            "output": str(output.expanduser().resolve()),
+        }
+    )
+
+
+@app.command()
+def finalize(
+    bundle: Annotated[Path, typer.Argument(exists=True, dir_okay=False, readable=True)],
+    document: Annotated[
+        Path,
+        typer.Option("--document", exists=True, dir_okay=False, readable=True),
+    ],
+    output: Annotated[Path, typer.Option("--output", "-o")],
+    project: Annotated[Path, typer.Option("--project")] = Path("."),
+    finalized_at: Annotated[
+        str | None,
+        typer.Option("--finalized-at", help="ISO 8601 timestamp with timezone."),
+    ] = None,
+    persist: Annotated[
+        bool, typer.Option("--persist", help="Also save the package in the project.")
+    ] = False,
+    force: Annotated[bool, typer.Option("--force")] = False,
+) -> None:
+    """Turn a reviewed draft into a canonical v0.3 package."""
+
+    try:
+        extraction_bundle = ExtractionBundle.model_validate_json(
+            bundle.read_text(encoding="utf-8")
+        )
+        paper_document = PaperDocument.model_validate_json(
+            document.read_text(encoding="utf-8")
+        )
+        repository = FileRepository(project) if persist else None
+        package, destination = FinalizeDraft(repository).execute(
+            extraction_bundle,
+            paper_document,
+            finalized_at=_optional_datetime(finalized_at, option="--finalized-at"),
+            persist=persist,
+            force=force,
+        )
+        atomic_write_text(output, _model_json(package), force=force)
+    except (OSError, json.JSONDecodeError, ValidationError, ValueError) as exc:
+        _abort(str(exc), code=2)
+    _print_json(
+        {
+            "action": "draft_finalized",
+            "paper_id": package.record.paper_id,
+            "state": package.state.value,
+            "output": str(output.expanduser().resolve()),
+            "repository_path": str(destination) if destination else None,
+        }
+    )
+
+
+@app.command()
+def read(
+    source: Annotated[Path, typer.Argument(exists=True, dir_okay=False, readable=True)],
+    provider_manifest: Annotated[
+        Path,
+        typer.Option(
+            "--provider-manifest",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+        ),
+    ],
+    output: Annotated[Path, typer.Option("--output", "-o")],
+    project: Annotated[Path, typer.Option("--project")] = Path("."),
+    ingested_at: Annotated[str | None, typer.Option("--ingested-at")] = None,
+    created_at: Annotated[str | None, typer.Option("--created-at")] = None,
+    force: Annotated[bool, typer.Option("--force")] = False,
+) -> None:
+    """Ingest a source and produce a reviewable extraction bundle."""
+
+    try:
+        repository = FileRepository(project)
+        paper_document, document_path = IngestDocument(repository).execute(
+            source,
+            ingested_at=_optional_datetime(ingested_at, option="--ingested-at"),
+            force=force,
+        )
+        provider = JsonExtractionProvider.from_path(provider_manifest)
+        bundle, draft_path = ExtractDocument(repository).execute(
+            paper_document,
+            provider,
+            created_at=_optional_datetime(created_at, option="--created-at"),
+            persist=True,
+            force=force,
+        )
+        atomic_write_text(output, _model_json(bundle), force=force)
+    except (
+        OSError,
+        RuntimeError,
+        UnicodeError,
+        json.JSONDecodeError,
+        ValidationError,
+        ValueError,
+    ) as exc:
+        _abort(str(exc), code=2)
+    _print_json(
+        {
+            "action": "paper_read",
+            "document_id": paper_document.document_id,
+            "draft_id": bundle.draft.draft_id,
+            "status": bundle.draft.status.value,
+            "document_path": str(document_path),
+            "draft_path": str(draft_path),
+            "output": str(output.expanduser().resolve()),
+            "next": "review the bundle, then run paperreading finalize",
         }
     )
 
@@ -338,7 +591,10 @@ def schema(
         str,
         typer.Option(
             "--kind",
-            help="paper, evidence, package, document, draft, or evidence-span",
+            help=(
+                "paper, evidence, package, document, draft, evidence-span, "
+                "extraction-bundle, extraction-manifest, or review-decisions"
+            ),
         ),
     ] = "paper",
     output: Annotated[Path | None, typer.Option("--output", "-o")] = None,
@@ -353,11 +609,16 @@ def schema(
         "document": PaperDocument,
         "draft": PaperDraft,
         "evidence-span": EvidenceSpan,
+        "extraction-bundle": ExtractionBundle,
+        "extraction-manifest": JsonExtractionManifest,
+        "review-decisions": ReviewDecisions,
     }
     model = schema_models.get(kind)
     if model is None:
         _abort(
-            "--kind must be paper, evidence, package, document, draft, or evidence-span",
+            "--kind must be paper, evidence, package, document, draft, "
+            "evidence-span, extraction-bundle, extraction-manifest, "
+            "or review-decisions",
             code=2,
         )
     content = json.dumps(model.model_json_schema(), ensure_ascii=False, indent=2) + "\n"

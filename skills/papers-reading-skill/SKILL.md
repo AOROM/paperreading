@@ -1,6 +1,6 @@
 ---
 name: papers-reading-skill
-description: Evidence-grounded AI research workflow for turning supplied economics, finance, management, and social-science papers or structured records into versioned PaperReading artifacts. Use when Codex must ingest text or Markdown, separate source-grounded claims from researcher analysis, bind findings to evidence IDs and locators, migrate v0.2 PaperRecord JSON, validate or verify a v0.3 PaperPackage, generate research extensions, export reviewable JSON or Markdown, or safely update a compatible 13-field literature workbook.
+description: Evidence-grounded AI research workflow for turning supplied economics, finance, management, and social-science papers or structured records into versioned PaperReading artifacts. Use when Codex must ingest text, Markdown, or a text-based PDF; separate source-grounded claims from researcher analysis; bind findings to evidence IDs and locators; review extraction candidates; migrate v0.2 PaperRecord JSON; validate or verify a v0.3 PaperPackage; generate research extensions; export reviewable JSON or Markdown; or safely update a compatible 13-field literature workbook.
 ---
 
 # PaperReading Core Adapter
@@ -8,9 +8,9 @@ description: Evidence-grounded AI research workflow for turning supplied economi
 ## Workflow
 
 1. Establish the supplied-source boundary. Identify which title, author, journal, date, DOI, page, section, table, figure, equation, appendix, and full-text surfaces are actually available.
-2. For UTF-8 text or Markdown, run `paperreading ingest <source> --output <document.json>`. Use the resulting source, section, block, character-range, and hash metadata; do not invent locators.
+2. For UTF-8 text, Markdown, or a text-based PDF, run `paperreading ingest <source> --output <document.json>`. Use the resulting source, page, section, block, character-range, and hash metadata; do not invent locators. A scanned PDF requires a separately authorized OCR workflow.
 3. Read the abstract and introduction, theory or hypotheses, data and variables, research design, baseline results, mechanisms, heterogeneity, robustness or endogeneity checks, conclusion, and relevant appendix material.
-4. Build a v0.3 `PaperPackage` using `references/paper-record.md`. Keep `GroundedPaperRecord`, `EvidenceSpan`, and `ResearchAnalysis` conceptually and structurally separate.
+4. Build a v0.3 `PaperPackage` using `references/paper-record.md`. When provider output is available, preserve it through `extract`, `review`, and `finalize`; never bypass unresolved Candidate or Conflict state. Keep `GroundedPaperRecord`, `EvidenceSpan`, and `ResearchAnalysis` conceptually and structurally separate.
 5. For an existing v0.2 record, run `paperreading migrate <record.json> --output <package.json>` rather than rewriting it manually. Preserve the resulting migration notes and unverified state.
 6. Run `paperreading validate <package.json>`. When a matching `PaperDocument` exists, also run `paperreading verify <package.json> --document <document.json> --strict --output <verified.json>`.
 7. Resolve every validation error before export. Keep partial or failed verification visible; never upgrade a package to verified by assertion.
@@ -41,6 +41,20 @@ Initialize a local project and ingest a supported source:
 ```bash
 paperreading init
 paperreading ingest source.md --output document.json
+```
+
+Replay an auditable extraction, review it, and finalize only when it is ready:
+
+```bash
+paperreading extract document.json \
+  --provider-manifest extraction-manifest.json \
+  --output bundle.json
+paperreading review bundle.json \
+  --decisions review-decisions.json \
+  --output reviewed.json
+paperreading finalize reviewed.json \
+  --document document.json \
+  --output package.json
 ```
 
 Migrate a v0.2 record:
@@ -77,8 +91,10 @@ The legacy `scripts/append_paper_reading.py` entry point remains a compatibility
 
 ## Current implementation boundary
 
-- Core ingestion supports UTF-8 text and Markdown only.
-- PDF parsing and provider-driven automatic extraction are roadmap capabilities, not current Core behavior.
+- Core ingestion supports UTF-8 text, Markdown, and optional PDFs that already contain an extractable text layer.
+- Core PDF ingestion does not implement OCR, page geometry, table reconstruction, or figure extraction.
+- The shipped JSON Provider is a deterministic replay adapter. It does not call a hosted model; real model adapters remain roadmap work.
+- Draft conflicts and unresolved fields require explicit review before finalization.
 - If the host can inspect another supplied format, record that review boundary honestly, but do not claim `paperreading verify` ran without a matching `PaperDocument`.
 - Batch processing, SQLite search, cross-paper synthesis, gap discovery, and method-specific auditing are not implemented.
 

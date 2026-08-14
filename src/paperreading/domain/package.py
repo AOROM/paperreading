@@ -236,7 +236,7 @@ class MethodAuditReport(DomainModel):
     method: str = Field(min_length=1)
     causal_support: CausalSupport
     checks: list[AuditCheck] = Field(default_factory=list)
-    auditor_version: str = "0.3.0"
+    auditor_version: str = "0.3.1"
 
     def referenced_evidence_ids(self) -> set[str]:
         return {item for check in self.checks for item in check.evidence_ids}
@@ -244,10 +244,12 @@ class MethodAuditReport(DomainModel):
 
 class RunManifest(DomainModel):
     run_id: str = Field(min_length=1)
-    pipeline_version: str = "0.3.0"
+    pipeline_version: str = "0.3.1"
     source_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    canonical_text_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     config_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     provider: str | None = None
+    provider_version: str | None = None
     model: str | None = None
     prompt_versions: dict[str, str] = Field(default_factory=dict)
     created_at: datetime
@@ -258,6 +260,8 @@ class RunManifest(DomainModel):
             raise ValueError("created_at must include a timezone")
         if self.model and not self.provider:
             raise ValueError("model requires a provider")
+        if self.provider_version and not self.provider:
+            raise ValueError("provider_version requires a provider")
         return self
 
 

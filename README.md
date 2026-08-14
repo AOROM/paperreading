@@ -13,14 +13,14 @@
   <p>
     <a href="https://github.com/AOROM/paperreading/actions/workflows/ci.yml"><img src="https://github.com/AOROM/paperreading/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
     <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&amp;logoColor=white" alt="Python 3.10 or newer">
-    <img src="https://img.shields.io/badge/version-0.3.0-4C1" alt="Version 0.3.0">
+    <img src="https://img.shields.io/badge/version-0.3.1-4C1" alt="Version 0.3.1">
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2EA44F" alt="MIT License"></a>
     <a href="https://github.com/AOROM/paperreading/stargazers"><img src="https://img.shields.io/github/stars/AOROM/paperreading?style=flat&amp;logo=github&amp;label=Stars" alt="GitHub stars"></a>
   </p>
   <p><strong>English</strong> · <a href="README.zh-CN.md">简体中文</a></p>
   <p>
     <a href="#try-it-in-60-seconds">Quick start</a> ·
-    <a href="#what-ships-in-v03">Capabilities</a> ·
+    <a href="#what-ships-in-v031">Capabilities</a> ·
     <a href="#how-it-works">Architecture</a> ·
     <a href="RESEARCH_PRINCIPLES.md">Research principles</a> ·
     <a href="ROADMAP.md">Roadmap</a> ·
@@ -31,7 +31,7 @@
 PaperReading is an alpha-stage Python core and Codex Skill for researchers and research-tool builders who need more than a fluent summary. Its schemas and validators preserve the chain from a source location to a claim, distinguish paper-reported content from later interpretation, guard causal language, and keep legacy research exports reviewable.
 
 > [!IMPORTANT]
-> **Current scope:** v0.3 ingests UTF-8 text and Markdown, migrates v0.2 records, normalizes evidence by stable ID, and verifies text locators and quotations. It does **not** yet parse PDFs, call an AI provider, run batch jobs, search a SQLite library, synthesize multiple papers, or discover research gaps automatically.
+> **Current scope:** v0.3.1 ingests UTF-8 text, Markdown, and text-based PDFs; replays staged extraction through an auditable JSON provider; enforces Draft → Review → Finalize; and verifies quotations with local fuzzy alignment. PDF support does **not** provide OCR, layout geometry, table reconstruction, or figure extraction. Hosted AI providers, batch jobs, SQLite search, cross-paper synthesis, and automatic gap discovery remain planned.
 
 ## From fluent summaries to defensible research artifacts
 
@@ -68,32 +68,37 @@ The fixture returns `valid: true`, `evidence_count: 4`, and `finding_count: 1`. 
 | Understand research safeguards | [Research Principles](RESEARCH_PRINCIPLES.md) |
 | Help shape the project | [Roadmap](ROADMAP.md) and [contribution guide](CONTRIBUTING.md) |
 
-## What ships in v0.3
+## What ships in v0.3.1
 
 | Capability | Status | Public contract |
 |---|---|---|
 | v0.3 research package | Implemented | `PaperPackage` separates document, grounded record, normalized evidence, analysis, audit, and run metadata |
-| Source-aware ingestion | Implemented | Deterministic UTF-8 `.txt`, `.md`, and `.markdown` parsing into `PaperDocument` blocks |
+| Source-aware ingestion | Implemented | Deterministic UTF-8 text/Markdown plus optional text-based PDF parsing behind one `DocumentParser` port |
+| Extraction lifecycle | Implemented | Provider-neutral staged extraction, candidate/conflict preservation, explicit human review, and guarded finalization |
+| Offline JSON provider | Implemented | Replays inspectable candidate and evidence output without a network call or hidden model dependency |
 | Evidence graph | Implemented | Research objects reference de-duplicated `EvidenceSpan` nodes by stable ID |
-| Evidence verification | Implemented | Source, page, block, section, quotation, and text-hash checks with explicit `verified`, `partial`, or `failed` status |
+| Evidence verification v2 | Implemented | Source, page, block, section, text-hash, and local-window fuzzy quotation checks with explicit states |
 | v0.2 migration | Implemented | Deterministic `PaperRecord` → `PaperPackage` migration with visible provenance limitations |
 | Analysis separation | Implemented | Researcher assessments and extensions live outside the source-grounded record |
 | Causal-language guard | Implemented | Causal wording requires an eligible design and an explicit identification strategy |
 | Export and compatibility | Implemented | Lossless JSON, reviewable Markdown, legacy 13-field projection, and safe Excel append |
 | Local project storage | Implemented | Atomic, inspectable JSON files under `.paperreading/`; no database required |
-| PDF / provider / batch / search / synthesis / gaps | Planned | Sequenced in the [roadmap](ROADMAP.md) and never presented as shipped |
+| OCR / hosted LLM / PDF geometry / batch / search / synthesis | Planned | Sequenced in the [roadmap](ROADMAP.md) and never presented as shipped |
 
 ## How it works
 
 ```mermaid
 flowchart LR
-    S["UTF-8 text or Markdown"] --> I["Deterministic ingestion"]
+    S["Text / Markdown / text-based PDF"] --> I["Parser adapters"]
     I --> D["PaperDocument"]
+    D --> E["Staged provider extraction"]
+    E --> R["PaperDraft: candidates + conflicts"]
+    R --> H["Explicit human review"]
+    H --> P["Finalized PaperPackage"]
     V2["v0.2 PaperRecord"] --> M["Deterministic migration"]
     M --> P["v0.3 PaperPackage"]
     D --> V["Evidence verifier"]
     P --> V
-    A["Skill or extraction adapter"] --> P
     V --> O{"Validated artifact"}
     O --> J["JSON"]
     O --> MD["Markdown"]
@@ -116,10 +121,10 @@ The normative [Research Principles](RESEARCH_PRINCIPLES.md) derive project decis
 
 ## Explore the command workflow
 
-Install Excel support only when it is needed:
+Install optional PDF and Excel adapters only when they are needed:
 
 ```bash
-python -m pip install -e ".[excel]"
+python -m pip install -e ".[pdf,excel]"
 ```
 
 Initialize an inspectable local project:
@@ -135,6 +140,24 @@ Exercise the source-ingestion contract with the synthetic Markdown fixture:
 ```bash
 paperreading ingest examples/source.example.md
 ```
+
+Run the complete, network-free Draft → Review → Finalize fixture:
+
+```bash
+paperreading ingest examples/source.example.md --output document.json
+paperreading extract document.json \
+  --provider-manifest examples/extraction-manifest.example.json \
+  --output bundle.json
+paperreading review bundle.json \
+  --decisions examples/review-decisions.example.json \
+  --output reviewed.json
+paperreading finalize reviewed.json \
+  --document document.json \
+  --output package.json
+paperreading verify package.json --document document.json --strict
+```
+
+`paperreading read` combines ingestion and extraction when a project repository is desired. The JSON provider is a deterministic replay adapter for evaluation and integration; it is not a hosted LLM. A future model adapter must implement the same provider contract and preserve candidate evidence, uncertainty, and run metadata.
 
 Exercise deterministic v0.2 migration without mutating the project:
 
@@ -161,7 +184,7 @@ paperreading verify package.json \
   --output verified-package.json
 ```
 
-The checked-in ingestion and migration examples exercise separate contracts; they are not automatically linked. In v0.3, a Skill or another extraction adapter constructs the source-linked package. PaperReading itself does not yet infer a complete research record from arbitrary prose.
+The extraction fixture is linked to the synthetic Markdown source and can be strictly verified end to end. It contains invented, non-citable material. Extracting an arbitrary paper still requires a compatible provider; PaperReading does not silently make a model call or claim OCR capability.
 
 ## The v0.3 artifact model
 
@@ -266,6 +289,7 @@ The Skill is an adapter, not a second implementation. It respects the supplied s
 | Document | Purpose |
 |---|---|
 | [Research Principles](RESEARCH_PRINCIPLES.md) | Normative rules for validity, evidence, inference, uncertainty, reproducibility, and ethics |
+| [Architecture](docs/architecture.md) | Parser and provider ports, artifact lifecycle, identity rules, and finalization gates |
 | [Roadmap](ROADMAP.md) | Shipped boundaries, planned hypotheses, milestones, and release gates |
 | [Contribution guide](CONTRIBUTING.md) | Architecture, schema evolution, compatibility, testing, and research-integrity checks |
 | [Security policy](SECURITY.md) | Private vulnerability-reporting guidance and supported-version policy |
@@ -281,7 +305,8 @@ paperreading/
 ├── docs/assets/            # Repository presentation assets and provenance
 ├── src/paperreading/
 │   ├── domain/          # v0.2 and v0.3 strict models
-│   ├── ingestion/       # deterministic text/Markdown parser
+│   ├── ingestion/       # text, Markdown, and optional text-based PDF parsers
+│   ├── providers/       # extraction protocol and offline JSON adapter
 │   ├── migrations/      # version-to-version transformations
 │   ├── verification/    # source-content evidence checks
 │   ├── validation/      # evidence-state and causal-language rules
@@ -299,7 +324,7 @@ paperreading/
 ## Development
 
 ```bash
-python -m pip install -e ".[excel,dev]"
+python -m pip install -e ".[excel,pdf,dev]"
 python -m ruff check .
 python -m ruff format --check .
 python -m mypy

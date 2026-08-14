@@ -144,7 +144,7 @@ class EvidenceVerification(DomainModel):
     quote_match: float | None = Field(default=None, ge=0, le=1)
     text_hash_match: bool | None = None
     issues: list[str] = Field(default_factory=list)
-    verifier_version: str = "0.3.0"
+    verifier_version: str = "0.3.1"
 
     @model_validator(mode="after")
     def validate_run_state(self) -> EvidenceVerification:

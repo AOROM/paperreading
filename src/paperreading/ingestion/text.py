@@ -15,6 +15,7 @@ from paperreading.domain import (
     DocumentPage,
     PaperDocument,
 )
+from paperreading.ingestion.base import DocumentParser
 
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*#*\s*$")
 
@@ -24,7 +25,23 @@ def _hash_text(text: str) -> str:
     return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
 
 
-def _blocks(text: str, *, markdown: bool) -> list[DocumentBlock]:
+def normalize_line_endings(text: str) -> str:
+    return text.replace("\r\n", "\n").replace("\r", "\n")
+
+
+def resolve_ingested_at(value: datetime | None) -> datetime:
+    resolved = value or datetime.now(timezone.utc)
+    if resolved.tzinfo is None or resolved.utcoffset() is None:
+        raise ValueError("ingested_at must include a timezone")
+    return resolved
+
+
+def blocks_from_text(
+    text: str,
+    *,
+    markdown: bool,
+    page_number: int = 1,
+) -> list[DocumentBlock]:
     result: list[DocumentBlock] = []
     section_levels: list[str] = []
     lines = text.splitlines(keepends=True)
@@ -42,11 +59,11 @@ def _blocks(text: str, *, markdown: bool) -> list[DocumentBlock]:
         stripped = content.strip()
         if not stripped:
             return
-        block_id = f"p1-b{len(result) + 1:04d}"
+        block_id = f"p{page_number}-b{len(result) + 1:04d}"
         result.append(
             DocumentBlock(
                 block_id=block_id,
-                page=1,
+                page=page_number,
                 kind=kind,
                 text=stripped,
                 char_start=start,
@@ -98,19 +115,27 @@ def _blocks(text: str, *, markdown: bool) -> list[DocumentBlock]:
 
 
 class TextDocumentParser:
-    def parse(self, source: Path) -> PaperDocument:
+    def supports(self, source: Path) -> bool:
+        return source.suffix.lower() in {".txt", ".md", ".markdown"}
+
+    def parse(
+        self,
+        source: Path,
+        *,
+        ingested_at: datetime | None = None,
+    ) -> PaperDocument:
         path = source.expanduser().resolve()
         suffix = path.suffix.lower()
-        if suffix not in {".txt", ".md", ".markdown"}:
+        if not self.supports(path):
             raise ValueError(f"unsupported text document extension: {suffix}")
         raw = path.read_bytes()
-        text = raw.decode("utf-8-sig").replace("\r\n", "\n").replace("\r", "\n")
+        text = normalize_line_endings(raw.decode("utf-8-sig"))
         if not text.strip():
             raise ValueError("source document is empty")
         digest = hashlib.sha256(raw).hexdigest()
         source_id = f"src-{digest[:16]}"
         markdown = suffix in {".md", ".markdown"}
-        blocks = _blocks(text, markdown=markdown)
+        blocks = blocks_from_text(text, markdown=markdown)
         return PaperDocument(
             document_id=source_id,
             manifest=DocumentManifest(
@@ -122,16 +147,20 @@ class TextDocumentParser:
                 size_bytes=len(raw),
                 page_count=1,
                 stored_path=None,
-                ingested_at=datetime.now(timezone.utc),
+                ingested_at=resolve_ingested_at(ingested_at),
             ),
             pages=[DocumentPage(page_number=1, text=text, blocks=blocks)],
         )
 
 
-def parser_for_path(path: Path) -> TextDocumentParser:
-    if path.suffix.lower() in {".txt", ".md", ".markdown"}:
-        return TextDocumentParser()
+def parser_for_path(path: Path) -> DocumentParser:
+    from paperreading.ingestion.pdf import PdfDocumentParser
+
+    parsers: tuple[DocumentParser, ...] = (TextDocumentParser(), PdfDocumentParser())
+    for parser in parsers:
+        if parser.supports(path):
+            return parser
     raise ValueError(
-        "no parser is available for this source; v0.3 currently supports UTF-8 "
-        "text and Markdown"
+        "no parser is available for this source; supported formats are UTF-8 "
+        "text, Markdown, and text-based PDF"
     )

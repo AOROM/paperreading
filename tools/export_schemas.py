@@ -12,6 +12,7 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
+from paperreading.application import ExtractionBundle, ReviewDecisions  # noqa: E402
 from paperreading.domain import (  # noqa: E402
     EvidenceRef,
     EvidenceSpan,
@@ -20,6 +21,7 @@ from paperreading.domain import (  # noqa: E402
     PaperPackage,
     PaperRecord,
 )
+from paperreading.providers import JsonExtractionManifest  # noqa: E402
 
 SCHEMAS = {
     # Stable root aliases.  The v0.2 names remain backward compatible.
@@ -29,6 +31,15 @@ SCHEMAS = {
     ROOT / "schemas" / "document.schema.json": PaperDocument.model_json_schema,
     ROOT / "schemas" / "draft.schema.json": PaperDraft.model_json_schema,
     ROOT / "schemas" / "evidence-span.schema.json": EvidenceSpan.model_json_schema,
+    ROOT
+    / "schemas"
+    / "extraction-bundle.schema.json": ExtractionBundle.model_json_schema,
+    ROOT
+    / "schemas"
+    / "extraction-manifest.schema.json": JsonExtractionManifest.model_json_schema,
+    ROOT
+    / "schemas"
+    / "review-decisions.schema.json": ReviewDecisions.model_json_schema,
     # Immutable versioned contracts.
     ROOT / "schemas" / "v0.2" / "paper.schema.json": PaperRecord.model_json_schema,
     ROOT / "schemas" / "v0.2" / "evidence.schema.json": EvidenceRef.model_json_schema,
@@ -39,6 +50,18 @@ SCHEMAS = {
     / "schemas"
     / "v0.3"
     / "evidence-span.schema.json": EvidenceSpan.model_json_schema,
+    ROOT
+    / "schemas"
+    / "v0.3"
+    / "extraction-bundle.schema.json": ExtractionBundle.model_json_schema,
+    ROOT
+    / "schemas"
+    / "v0.3"
+    / "extraction-manifest.schema.json": JsonExtractionManifest.model_json_schema,
+    ROOT
+    / "schemas"
+    / "v0.3"
+    / "review-decisions.schema.json": ReviewDecisions.model_json_schema,
 }
 
 
