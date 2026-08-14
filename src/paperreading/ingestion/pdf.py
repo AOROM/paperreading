@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import importlib
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -20,11 +21,11 @@ from paperreading.ingestion.text import (
 )
 
 try:
-    from pypdf import PdfReader as _PdfReader
+    _pypdf = importlib.import_module("pypdf")
 except ModuleNotFoundError:  # pragma: no cover - exercised without the optional extra
-    _PdfReader = None
-
-PdfReader: Any = _PdfReader
+    PdfReader: Any = None
+else:
+    PdfReader = _pypdf.PdfReader
 
 
 class PdfDocumentParser:
