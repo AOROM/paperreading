@@ -34,7 +34,7 @@ dependencies = [
 excel = ["openpyxl>=3.1,<4"]
 pdf = ["pypdf>=6.12,<7"]
 dev = [
-  "mypy>=1.15,<2",
+  "mypy>=1.15,<3",
   "PyYAML>=6,<7",
   "ruff>=0.12,<1",
 ]
