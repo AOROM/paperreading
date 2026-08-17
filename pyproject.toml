@@ -27,7 +27,7 @@ classifiers = [
 dependencies = [
   "pydantic>=2.13,<2.14",
   "tomli>=2,<3; python_version < '3.11'",
-  "typer>=0.20,<0.21",
+  "typer>=0.20,<0.28",
 ]
 
 [project.optional-dependencies]
